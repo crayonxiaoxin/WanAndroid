@@ -10,7 +10,7 @@ import com.github.crayonxiaoxin.wanandroid.ui.login.LoginScreen
 
 @Composable
 fun NavMain(controller: NavHostController = rememberNavController()) {
-    NavHost(navController = controller, startDestination = "login") {
+    NavHost(navController = controller, startDestination = "home") {
         composable("home") { HomeScreen(controller = controller) }
         composable("login") { LoginScreen(controller = controller) }
     }

@@ -83,7 +83,7 @@ private fun LoginForm(controller: NavHostController) {
             contentDescription = "logo",
             modifier = Modifier
                 .constrainAs(logo) {
-                    bottom.linkTo(input1.top)
+                    bottom.linkTo(input1.top,margin = 30.dp)
                     centerHorizontallyTo(parent)
                 }
                 .width(200.dp)
