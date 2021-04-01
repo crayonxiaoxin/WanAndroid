@@ -20,7 +20,10 @@ fun HomeScreen(controller: NavHostController) {
             TopAppBar(title = { Text("HomeScreen") })
         },
         bottomBar = {
-            BottomNavigation() {
+            BottomNavigation(
+                backgroundColor = MaterialTheme.colors.background,
+                contentColor = MaterialTheme.colors.primarySurface
+            ) {
                 BottomNavigationItem(
                     selected = selectedTab.value == 0,
                     onClick = { selectedTab.value = 0 },
