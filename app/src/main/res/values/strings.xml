@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">WanAndroid</string>
+    <string name="tab_home">首页</string>
+    <string name="tab_tixi">体系</string>
+    <string name="tab_daohang">导航</string>
+    <string name="tab_mine">我的</string>
 </resources>

@@ -57,10 +57,15 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:1.0.0-alpha09"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha03"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0-alpha01"
-    implementation "com.google.accompanist:accompanist-coil:0.7.0"
-    implementation "com.google.accompanist:accompanist-insets:0.7.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha05"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
+
+    // accompanist
+    implementation "com.google.accompanist:accompanist-coil:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-insets:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+    // If using indicators, also depend on
+    implementation "com.google.accompanist:accompanist-pager-indicators:$accompanist_version"
 }
