@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import com.github.crayonxiaoxin.wanandroid.R
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -83,7 +84,7 @@ private fun LoginForm(controller: NavHostController) {
             contentDescription = "logo",
             modifier = Modifier
                 .constrainAs(logo) {
-                    bottom.linkTo(input1.top,margin = 30.dp)
+                    bottom.linkTo(input1.top, margin = 30.dp)
                     centerHorizontallyTo(parent)
                 }
                 .width(200.dp)
@@ -118,7 +119,7 @@ private fun LoginForm(controller: NavHostController) {
             onClick = {
                 isLogin.value = true
                 Log.e("LoginScreen", "LoginForm: " + passwordState.text)
-                //                controller.navigate("home")
+                controller.navigate("home")
             },
             modifier = Modifier
                 .constrainAs(button) {
