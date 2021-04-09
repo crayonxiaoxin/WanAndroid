@@ -1,6 +1,5 @@
 package com.github.crayonxiaoxin.wanandroid.ui.main
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,8 +11,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Subject
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,13 +21,15 @@ import com.github.crayonxiaoxin.wanandroid.R
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPagerApi::class)
+
+@ExperimentalPagerApi
 @Composable
 fun MainScreen(controller: NavHostController) {
-    val (selectedTab, setSelectedTab) = remember { mutableStateOf(HomeTabs.HOME) }
     val pagerState = rememberPagerState(pageCount = HomeTabs.values().size)
     val scope = rememberCoroutineScope()
     Box(
@@ -39,39 +38,13 @@ fun MainScreen(controller: NavHostController) {
             .background(color = MaterialTheme.colors.primarySurface)
     ) {
         Scaffold(
-            bottomBar = {
-                BottomNavigation(
-                    backgroundColor = MaterialTheme.colors.background,
-                    contentColor = MaterialTheme.colors.primarySurface
-                ) {
-                    HomeTabs.values().forEach { tab ->
-                        BottomNavigationItem(
-                            selectedContentColor = MaterialTheme.colors.primary,
-                            unselectedContentColor = Color.LightGray,
-                            selected = (tab == HomeTabs.values()[pagerState.currentPage]),
-                            onClick = {
-                                setSelectedTab(tab)
-                                scope.launch {
-                                    Log.e("TAG", "HomeScreen: " + HomeTabs.values().indexOf(tab))
-                                    pagerState.scrollToPage(HomeTabs.values().indexOf(tab))
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = tab.icon,
-                                    contentDescription = stringResource(id = tab.title)
-                                )
-                            },
-                            label = {
-                                Text(text = stringResource(tab.title))
-                            }
-                        )
-                    }
-                }
-            }
+            bottomBar = { BottomBar(pagerState, scope) }
         ) {
-
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+            HorizontalPager(
+                state = pagerState,
+                dragEnabled = false,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
                 val tab = HomeTabs.values()[page]
                 Box(
                     Modifier
@@ -87,8 +60,38 @@ fun MainScreen(controller: NavHostController) {
             }
         }
     }
+}
 
-
+@ExperimentalPagerApi
+@Composable
+private fun BottomBar(
+    pagerState: PagerState,
+    scope: CoroutineScope
+) {
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.background,
+        contentColor = MaterialTheme.colors.primarySurface
+    ) {
+        HomeTabs.values().forEach { tab ->
+            BottomNavigationItem(
+                selectedContentColor = MaterialTheme.colors.primary,
+                unselectedContentColor = Color.LightGray,
+                selected = (HomeTabs.values().indexOf(tab) == pagerState.currentPage),
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(HomeTabs.values().indexOf(tab))
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = tab.icon,
+                        contentDescription = stringResource(id = tab.title)
+                    )
+                },
+                label = { Text(text = stringResource(tab.title)) }
+            )
+        }
+    }
 }
 
 private enum class HomeTabs(@StringRes val title: Int, val icon: ImageVector) {

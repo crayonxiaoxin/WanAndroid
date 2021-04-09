@@ -2,7 +2,7 @@
 buildscript {
     ext {
         compose_version = '1.0.0-beta01'
-        accompanist_version = '0.7.0'
+        accompanist_version = '0.7.1'
         coroutines_version = '1.4.2'
         ext.retrofit_version = "2.9.0"
         ext.okhttp_logging_version = "3.14.9"

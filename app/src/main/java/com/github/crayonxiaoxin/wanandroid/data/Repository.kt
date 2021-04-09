@@ -7,7 +7,8 @@ import kotlinx.coroutines.withContext
 object Repository {
     private val apiService = ApiService()
 
-    suspend fun getHomeBanner3() = go { apiService.getHomeBanner() }
+    suspend fun getHomeBanner() = go { apiService.getHomeBanner() }
+    suspend fun getTopArticles() = go { apiService.getTopArticles() }
 
     private suspend fun <T> go(func: suspend CoroutineScope.() -> T): Result<T> {
         return withContext(Dispatchers.IO) {
