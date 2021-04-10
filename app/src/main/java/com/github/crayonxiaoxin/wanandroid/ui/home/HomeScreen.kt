@@ -1,68 +1,192 @@
 package com.github.crayonxiaoxin.wanandroid.ui.home
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.github.crayonxiaoxin.wanandroid.HomeBannerAspectRatio
+import com.github.crayonxiaoxin.wanandroid.HomeBannerInterval
+import com.github.crayonxiaoxin.wanandroid.HomeBannerMaxCount
+import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.HomeBannerData
 import com.google.accompanist.coil.CoilImage
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalPagerApi
 @Composable
-fun HomeScreen(controller: NavHostController, viewModel: HomeScreenVM = viewModel()) {
-    Scaffold(
-//        topBar = { HomeTopBar() }
+fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
+    Scaffold {
+        Text(text = "api broken", modifier = Modifier.padding(32.dp))
+//        vm.getBanner()
+//        vm.getTopArticles()
+//        vm.getArticles()
+//        Column {
+//            HomeBanner(vm)
+//
+//            val homeListState = rememberLazyListState()
+//            LazyColumn(state = homeListState) {
+//                if (vm.topArticleSize > 0) {
+//                    stickyHeader(key = 1) {
+//                        HomeListHeader("置顶文章")
+//                    }
+//                }
+//                items(vm.topArticleSize) { item ->
+//                    ArticleItem(vm.topArticleList.value[item], true)
+//                }
+//                if (vm.articleListSize > 0) {
+//                    stickyHeader(key = 2) {
+//                        HomeListHeader("最新文章")
+//                    }
+//                }
+//                items(vm.articleListSize) { item ->
+//                    ArticleItem(vm.articleList.value[item])
+//                }
+//            }
+//        }
+    }
+}
+
+@Composable
+private fun HomeListHeader(title: String) {
+    Text(
+        text = title,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color(0xFFF2F2F2))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
+private fun ArticleItem(data: ArticleData, isTop: Boolean = false) {
+    Card(
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .clickable { Log.e("ArticleItem", "ArticleItem: 1") }
+            .fillMaxWidth(),
+        elevation = 2.dp
     ) {
-        viewModel.getBanner()
-        viewModel.getTopArticles()
-        LazyColumn() {
-            item {
-                HomeBanner(viewModel)
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Row {
+                data.fresh?.let {
+                    ArticleTag(text = "新", color = Color.Red, MaterialTheme.typography.body2)
+                }
+                Text(
+                    text = data.title.orEmpty(),
+                    style = MaterialTheme.typography.body2,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            items(viewModel.articleSize) { item ->
-                Text(text = viewModel.articleList.value[item].title)
+            Row(modifier = Modifier.padding(vertical = 4.dp)) {
+                if (isTop) {
+                    ArticleTag("置顶", Color.Red)
+                }
+                data.tags?.forEach {
+                    ArticleTag(it.name, Color(0xFF009a61))
+                }
+                data.superChapterName?.let {
+                    Text(
+                        text = "分类: $it / ${data.chapterName}",
+                        style = MaterialTheme.typography.caption
+                    )
+                }
+            }
+            Row {
+                data.author?.let {
+                    Text(
+                        text = if (it.isNotEmpty()) "作者: $it" else "分享人: ${data.shareUser}",
+                        style = MaterialTheme.typography.caption
+                    )
+                }
+                data.niceDate?.let {
+                    Text(
+                        text = "时间: $it",
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
-
     }
+}
+
+@Composable
+private fun ArticleTag(
+    text: String,
+    color: Color,
+    textStyle: TextStyle = MaterialTheme.typography.caption
+) {
+    Text(
+        text = text,
+        color = color,
+        style = textStyle,
+        modifier = Modifier
+            .padding(end = 10.dp)
+            .border(
+                width = 1.dp,
+                color = color,
+                shape = RoundedCornerShape(4.dp)
+            )
+            .padding(horizontal = 2.dp)
+    )
 }
 
 @ExperimentalPagerApi
 @Composable
-private fun HomeBanner(viewModel: HomeScreenVM) {
-    val bannerSize = viewModel.bannerSize
+private fun HomeBanner(vm: HomeScreenVM) {
+    val bannerSize = vm.bannerSize
     if (bannerSize > 0) {
         // 使用 Int.MAX_VALUE 会出错
         val pagerState = rememberPagerState(
-            pageCount = bannerSize * 10000,
-            initialPage = bannerSize * 5000
+            pageCount = bannerSize * HomeBannerMaxCount,
+            initialPage = bannerSize * HomeBannerMaxCount / 2
         )
-        HorizontalPager(
-            state = pagerState,
-            offscreenLimit = 2,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) { page ->
-            HomeBannerItem(item = viewModel.bannerList.value[page % bannerSize])
+
+        LaunchedEffect(key1 = 1) {
+            while (true) {
+                delay(HomeBannerInterval)
+                var next = pagerState.currentPage
+                next = if (next + 1 > pagerState.pageCount) 0 else next + 1
+                pagerState.animateScrollToPage(next)
+            }
+        }
+
+        BoxWithConstraints {
+            HorizontalPager(
+                state = pagerState,
+                offscreenLimit = 2,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(this.maxWidth.times(HomeBannerAspectRatio))
+            ) { page ->
+                HomeBannerItem(item = vm.bannerList.value[page % bannerSize])
+            }
         }
     }
 }

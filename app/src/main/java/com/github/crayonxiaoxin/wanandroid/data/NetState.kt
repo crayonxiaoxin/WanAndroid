@@ -7,7 +7,7 @@ sealed class NetState {
     object None : NetState()
     object Loading : NetState()
     object Success : NetState()
-    data class Error(val exception: Exception) : NetState()
+    data class Error(val errMsg: String?) : NetState()
 }
 
 fun MutableState<NetState>.Loading() {
@@ -22,6 +22,6 @@ fun MutableState<NetState>.None() {
     this.value = NetState.None
 }
 
-fun MutableState<NetState>.Error(exception: Exception) {
-    this.value = NetState.Error(exception = exception)
+fun MutableState<NetState>.Error(errMsg:String?) {
+    this.value = NetState.Error(errMsg = errMsg)
 }

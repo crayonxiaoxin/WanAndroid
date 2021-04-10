@@ -9,6 +9,7 @@ object Repository {
 
     suspend fun getHomeBanner() = go { apiService.getHomeBanner() }
     suspend fun getTopArticles() = go { apiService.getTopArticles() }
+    suspend fun getArticles(page: Int = 1) = go { apiService.getArticles(page = page) }
 
     private suspend fun <T> go(func: suspend CoroutineScope.() -> T): Result<T> {
         return withContext(Dispatchers.IO) {

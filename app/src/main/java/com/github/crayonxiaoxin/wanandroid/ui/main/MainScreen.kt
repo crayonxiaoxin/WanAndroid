@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
@@ -18,7 +19,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
+import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
+import com.github.crayonxiaoxin.wanandroid.ui.mine.MineScreen
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.navigationBarsWithImePadding
+import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -27,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@ExperimentalPagerApi
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(controller: NavHostController) {
     val pagerState = rememberPagerState(pageCount = HomeTabs.values().size)
@@ -38,12 +44,15 @@ fun MainScreen(controller: NavHostController) {
             .background(color = MaterialTheme.colors.primarySurface)
     ) {
         Scaffold(
-            bottomBar = { BottomBar(pagerState, scope) }
-        ) {
+            bottomBar = { BottomBar(pagerState, scope) },
+            modifier = Modifier.navigationBarsPadding() // 防止被虚拟导航覆盖
+        ) { innerPadding ->
             HorizontalPager(
                 state = pagerState,
                 dragEnabled = false,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
             ) { page ->
                 val tab = HomeTabs.values()[page]
                 Box(
@@ -53,6 +62,10 @@ fun MainScreen(controller: NavHostController) {
                 ) {
                     if (tab == HomeTabs.HOME) {
                         HomeScreen(controller)
+                    } else if (tab == HomeTabs.DAOHANG) {
+                        DetailScreen(controller = controller, link = "https://www.baidu.com")
+                    } else if (tab == HomeTabs.MINE) {
+                        MineScreen(controller)
                     } else {
                         Text(tab.name)
                     }

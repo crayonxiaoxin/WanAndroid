@@ -1,7 +1,7 @@
 package com.github.crayonxiaoxin.wanandroid.data
 
-import android.os.Build
 import com.github.crayonxiaoxin.wanandroid.BuildConfig
+import com.github.crayonxiaoxin.wanandroid.model.Articles
 import com.github.crayonxiaoxin.wanandroid.model.HomeBannerModel
 import com.github.crayonxiaoxin.wanandroid.model.TopArticle
 import okhttp3.OkHttpClient
@@ -9,6 +9,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface ApiService {
 
@@ -17,6 +18,9 @@ interface ApiService {
 
     @GET("article/top/json")
     suspend fun getTopArticles(): TopArticle
+
+    @GET("article/list/{page}/json")
+    suspend fun getArticles(@Path("page") page: Int = 1): Articles
 
     companion object {
         val BASE_URL = "https://www.wanandroid.com/"
