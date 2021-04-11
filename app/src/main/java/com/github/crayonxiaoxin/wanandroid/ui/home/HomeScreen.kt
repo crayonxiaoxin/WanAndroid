@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,11 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import com.github.crayonxiaoxin.wanandroid.HomeBannerAspectRatio
 import com.github.crayonxiaoxin.wanandroid.HomeBannerInterval
 import com.github.crayonxiaoxin.wanandroid.HomeBannerMaxCount
+import com.github.crayonxiaoxin.wanandroid.data.NetState
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.HomeBannerData
+import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
+import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
 import com.google.accompanist.coil.CoilImage
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -40,35 +47,91 @@ import kotlinx.coroutines.delay
 @ExperimentalPagerApi
 @Composable
 fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
-    Scaffold {
-        Text(text = "api broken", modifier = Modifier.padding(32.dp))
-//        vm.getBanner()
-//        vm.getTopArticles()
-//        vm.getArticles()
-//        Column {
-//            HomeBanner(vm)
-//
-//            val homeListState = rememberLazyListState()
-//            LazyColumn(state = homeListState) {
-//                if (vm.topArticleSize > 0) {
-//                    stickyHeader(key = 1) {
-//                        HomeListHeader("置顶文章")
-//                    }
-//                }
-//                items(vm.topArticleSize) { item ->
-//                    ArticleItem(vm.topArticleList.value[item], true)
-//                }
-//                if (vm.articleListSize > 0) {
-//                    stickyHeader(key = 2) {
-//                        HomeListHeader("最新文章")
-//                    }
-//                }
-//                items(vm.articleListSize) { item ->
-//                    ArticleItem(vm.articleList.value[item])
-//                }
-//            }
-//        }
+    var state by remember {
+        mutableStateOf(LoadState.Content)
     }
+//    state = when (vm.bannerNetState.value) {
+//        NetState.Loading -> LoadState.Loading
+//        NetState.Success -> LoadState.Content
+//        is NetState.Error -> LoadState.Retry
+//        else -> LoadState.Loading
+//    }
+    val bannerState by vm.bannerList.observeAsState()
+    if (bannerState == null) {
+        vm.getBanner()
+    }
+    val topArticleState by vm.topArticleList.observeAsState()
+    if (topArticleState == null) {
+        vm.getTopArticles()
+    }
+    val articleState by vm.articleList.observeAsState()
+    // Todo: 状态改变是否会导致整个HomeScreen刷新？如果是，那么需要确保不能重复获取数据
+    Log.e("TAG", "HomeScreen: articleState 1 is null = ${articleState == null}")
+    if (articleState.isNullOrEmpty()) {
+        vm.getArticles()
+    }
+    LoadStateLayout(
+        state = state,
+        retryOnClick = {
+//            vm.getBanner()
+//            vm.getTopArticles()
+//            vm.getArticles()
+        }
+    ) {
+        Scaffold {
+//        Text(text = "api broken", modifier = Modifier.padding(32.dp))
+            Column {
+                HomeBanner(vm = vm, bannerState = bannerState)
+
+                val homeListState = rememberLazyListState()
+                LazyColumn(state = homeListState) {
+                    topArticleState?.let { articles ->
+                        if (articles.isNotEmpty()) {
+                            stickyHeader(key = 1) {
+                                HomeListHeader("置顶文章")
+                            }
+                            items(articles.size) { item ->
+                                ArticleItem(
+                                    data = articles[item],
+                                    isTop = true,
+                                    onItemClick = {
+                                        toDetail(
+                                            controller = controller,
+                                            url = it.link
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    articleState?.let { articles ->
+                        if (articles.isNotEmpty()) {
+                            stickyHeader(key = 2) {
+                                HomeListHeader("最新文章")
+                            }
+                            items(articles.size) { item ->
+                                ArticleItem(
+                                    data = articles[item],
+                                    onItemClick = {
+                                        toDetail(
+                                            controller = controller,
+                                            url = it.link
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+fun toDetail(controller: NavHostController, url: String?) {
+    controller.navigate("detail/$url")
 }
 
 @Composable
@@ -84,18 +147,22 @@ private fun HomeListHeader(title: String) {
 }
 
 @Composable
-private fun ArticleItem(data: ArticleData, isTop: Boolean = false) {
+private fun ArticleItem(
+    data: ArticleData,
+    onItemClick: (ArticleData) -> Unit = {},
+    isTop: Boolean = false
+) {
     Card(
         modifier = Modifier
             .padding(vertical = 4.dp)
-            .clickable { Log.e("ArticleItem", "ArticleItem: 1") }
+            .clickable { onItemClick(data) }
             .fillMaxWidth(),
         elevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             Row {
                 data.fresh?.let {
-                    ArticleTag(text = "新", color = Color.Red, MaterialTheme.typography.body2)
+                    ArticleTag(text = "新", color = Color.Red, MaterialTheme.typography.caption)
                 }
                 Text(
                     text = data.title.orEmpty(),
@@ -159,9 +226,9 @@ private fun ArticleTag(
 
 @ExperimentalPagerApi
 @Composable
-private fun HomeBanner(vm: HomeScreenVM) {
-    val bannerSize = vm.bannerSize
-    if (bannerSize > 0) {
+private fun HomeBanner(vm: HomeScreenVM, bannerState: List<HomeBannerData>?) {
+    val bannerSize = bannerState?.size ?: 0
+    if (bannerSize > 0 && bannerState != null) {
         // 使用 Int.MAX_VALUE 会出错
         val pagerState = rememberPagerState(
             pageCount = bannerSize * HomeBannerMaxCount,
@@ -185,7 +252,7 @@ private fun HomeBanner(vm: HomeScreenVM) {
                     .fillMaxWidth()
                     .height(this.maxWidth.times(HomeBannerAspectRatio))
             ) { page ->
-                HomeBannerItem(item = vm.bannerList.value[page % bannerSize])
+                HomeBannerItem(item = bannerState!!.get(page % bannerSize))
             }
         }
     }

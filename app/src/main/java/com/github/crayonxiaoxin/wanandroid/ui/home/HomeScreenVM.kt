@@ -1,70 +1,71 @@
 package com.github.crayonxiaoxin.wanandroid.ui.home
 
-import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.crayonxiaoxin.wanandroid.data.*
+import com.github.crayonxiaoxin.wanandroid.data.NetState
+import com.github.crayonxiaoxin.wanandroid.data.Repository
+import com.github.crayonxiaoxin.wanandroid.data.Result
+import com.github.crayonxiaoxin.wanandroid.data.succeeded
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.HomeBannerData
 import kotlinx.coroutines.launch
 
 class HomeScreenVM : ViewModel() {
 
-    var bannerList = mutableStateOf(listOf<HomeBannerData>())
-    val bannerSize
-        get() = bannerList.value.size
-    var bannerNetState = mutableStateOf<NetState>(NetState.None)
+    private val _bannerList = MutableLiveData<List<HomeBannerData>>()
+    val bannerList: LiveData<List<HomeBannerData>> = _bannerList
+    var bannerNetState: NetState = NetState.None
 
     fun getBanner() {
         viewModelScope.launch {
-            bannerNetState.Loading()
+            bannerNetState = NetState.Loading
             val res = Repository.getHomeBanner()
             if (res.succeeded) {
-                bannerNetState.Success()
-                bannerList.value = (res as Result.Success).data.data
+                bannerNetState = NetState.Success
+                _bannerList.value = (res as Result.Success).data.data
             } else {
-                bannerNetState.Error((res as Result.Error).exception.message)
+                bannerNetState = NetState.Error((res as Result.Error).exception.message)
             }
         }
     }
 
-    var topArticleList = mutableStateOf(listOf<ArticleData>())
-    val topArticleSize
-        get() = topArticleList.value.size
-    var topArticleNetState = mutableStateOf<NetState>(NetState.None)
+    private val _topArticleList = MutableLiveData<List<ArticleData>>()
+    var topArticleList = _topArticleList
+    var topArticleNetState: NetState = NetState.None
 
     fun getTopArticles() {
         viewModelScope.launch {
-            topArticleNetState.Loading()
+            topArticleNetState = NetState.Loading
             val res = Repository.getTopArticles()
             if (res.succeeded) {
-                topArticleNetState.Success()
-                topArticleList.value = (res as Result.Success).data.data
+                topArticleNetState = NetState.Success
+                _topArticleList.value = (res as Result.Success).data.data
             } else {
-                topArticleNetState.Error((res as Result.Error).exception.message)
+                topArticleNetState = NetState.Error((res as Result.Error).exception.message)
             }
         }
     }
 
-    var articleList = mutableStateOf(arrayListOf<ArticleData>())
-    val articleListSize
-        get() = articleList.value.size
-    var articleNetState = mutableStateOf<NetState>(NetState.None)
-    var articleCurrentPage = mutableStateOf(1)
-    var articleTotalPage = mutableStateOf(1)
+    private val _articleList = MutableLiveData(ArrayList<ArticleData>())
+    var articleList = _articleList
+    var articleNetState: NetState = NetState.None
+    var articleCurrentPage = 1
+    var articleTotalPage = 1
     fun getArticles() {
-        if (articleCurrentPage.value <= articleTotalPage.value) {
+        if (articleCurrentPage <= articleTotalPage) {
             viewModelScope.launch {
-                articleNetState.Loading()
-                val res = Repository.getArticles(articleCurrentPage.value)
+                articleNetState = NetState.Loading
+                val res = Repository.getArticles(articleCurrentPage)
                 if (res.succeeded) {
-                    articleNetState.Success()
+                    articleNetState = NetState.Success
                     val data = (res as Result.Success).data.data
-                    articleList.value.addAll(data.datas)
-                    articleTotalPage.value = data.pageCount
-                    articleCurrentPage.value += 1
+                    articleList.value?.addAll(data.datas)
+                    articleTotalPage = data.pageCount
+                    articleCurrentPage += 1
                 } else {
-                    articleNetState.Error((res as Result.Error).exception.message)
+                    articleNetState = NetState.Error((res as Result.Error).exception.message)
                 }
             }
         }

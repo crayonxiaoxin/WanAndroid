@@ -33,6 +33,9 @@ fun DetailScreen(controller: NavHostController, link: String) {
                     ) {
                         Text(text = "详情")
                     }
+                },
+                navigationIconClick = {
+                    controller.popBackStack()
                 }
             )
         }
@@ -70,9 +73,10 @@ private fun DetailTopBar(
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "",
-            modifier = Modifier.clickable { }
+            modifier = Modifier.clickable { navigationIconClick() }
         )
     },
+    navigationIconClick: () -> Unit = {},
     actions: @Composable () -> Unit = {}
 ) {
     Box(modifier = modifier) {

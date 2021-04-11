@@ -17,10 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
 import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
+import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreenVM
 import com.github.crayonxiaoxin.wanandroid.ui.mine.MineScreen
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.navigationBarsWithImePadding
@@ -32,12 +34,12 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(controller: NavHostController) {
     val pagerState = rememberPagerState(pageCount = HomeTabs.values().size)
     val scope = rememberCoroutineScope()
+    val homeVm:HomeScreenVM = viewModel()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -61,7 +63,7 @@ fun MainScreen(controller: NavHostController) {
                         .background(color = MaterialTheme.colors.secondary)
                 ) {
                     if (tab == HomeTabs.HOME) {
-                        HomeScreen(controller)
+                        HomeScreen(controller,homeVm)
                     } else if (tab == HomeTabs.DAOHANG) {
                         DetailScreen(controller = controller, link = "https://www.baidu.com")
                     } else if (tab == HomeTabs.MINE) {
