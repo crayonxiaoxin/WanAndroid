@@ -48,7 +48,7 @@ class HomeScreenVM : ViewModel() {
         }
     }
 
-    private val _articleList = MutableLiveData(ArrayList<ArticleData>())
+    private val _articleList = MutableLiveData<List<ArticleData>>()
     var articleList = _articleList
     var articleNetState: NetState = NetState.None
     var articleCurrentPage = 1
@@ -61,7 +61,13 @@ class HomeScreenVM : ViewModel() {
                 if (res.succeeded) {
                     articleNetState = NetState.Success
                     val data = (res as Result.Success).data.data
-                    articleList.value?.addAll(data.datas)
+                    if (_articleList.value != null) {
+                        val newList = _articleList.value!!.map { it.copy() }
+                            .apply { toMutableList().addAll(data.datas) }
+                        _articleList.value = newList
+                    } else {
+                        _articleList.value = data.datas
+                    }
                     articleTotalPage = data.pageCount
                     articleCurrentPage += 1
                 } else {

@@ -57,17 +57,21 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
 //        else -> LoadState.Loading
 //    }
     val bannerState by vm.bannerList.observeAsState()
-    if (bannerState == null) {
-        vm.getBanner()
-    }
+
     val topArticleState by vm.topArticleList.observeAsState()
-    if (topArticleState == null) {
-        vm.getTopArticles()
-    }
+//    if (topArticleState == null) {
+//        vm.getTopArticles()
+//    }
+    Log.e("TAG", "HomeScreen: test 1" )
     val articleState by vm.articleList.observeAsState()
     // Todo: 状态改变是否会导致整个HomeScreen刷新？如果是，那么需要确保不能重复获取数据
     Log.e("TAG", "HomeScreen: articleState 1 is null = ${articleState == null}")
-    if (articleState.isNullOrEmpty()) {
+//    if (articleState.isNullOrEmpty()) {
+//        vm.getArticles()
+//    }
+    if (bannerState == null) {
+        vm.getBanner()
+        vm.getTopArticles()
         vm.getArticles()
     }
     LoadStateLayout(
