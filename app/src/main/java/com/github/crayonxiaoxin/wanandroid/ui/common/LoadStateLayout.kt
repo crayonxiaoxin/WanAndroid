@@ -36,10 +36,14 @@ fun LoadStateLayout(
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        LoadStateFadeInOut(state == LoadState.Content, content)
-        LoadStateFadeInOut(state == LoadState.Loading, loading)
-        LoadStateFadeInOut(state == LoadState.Retry, retry)
-        LoadStateFadeInOut(state == LoadState.Empty, empty)
+        LoadStateFadeInOut(
+            isShow = state == LoadState.Content,
+            content = content,
+            initiallyVisible = false // Note: 用于初始化（例如 webView loadUrl 需要在 content 中完成）
+        )
+        LoadStateFadeInOut(isShow = state == LoadState.Loading, content = loading)
+        LoadStateFadeInOut(isShow = state == LoadState.Retry, content = retry)
+        LoadStateFadeInOut(isShow = state == LoadState.Empty, content = empty)
     }
 }
 
@@ -47,10 +51,12 @@ fun LoadStateLayout(
 @Composable
 private fun LoadStateFadeInOut(
     isShow: Boolean,
+    initiallyVisible: Boolean = false,
     content: @Composable() () -> Unit
 ) {
     AnimatedVisibility(
         visible = isShow,
+        initiallyVisible = initiallyVisible,
         enter = fadeIn(animationSpec = tween(easing = FastOutLinearInEasing)),
         exit = fadeOut(animationSpec = tween(easing = LinearOutSlowInEasing))
     ) {

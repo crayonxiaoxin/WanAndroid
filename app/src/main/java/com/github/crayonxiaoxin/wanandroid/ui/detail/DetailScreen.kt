@@ -2,6 +2,7 @@ package com.github.crayonxiaoxin.wanandroid.ui.detail
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -23,6 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.data.NetState
 import com.github.crayonxiaoxin.wanandroid.toDetail
+import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.DetailTopBar
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
@@ -53,7 +55,7 @@ fun DetailScreen(controller: NavHostController, link: String) {
             )
         }
     ) {
-        LoadStateLayout(state = state.value) {
+        LoadStateLayout(state = state.value, retryOnClick = {}) {
             AndroidView(
                 factory = { context ->
                     WebView(context).apply {
@@ -67,7 +69,8 @@ fun DetailScreen(controller: NavHostController, link: String) {
                                 view: WebView?,
                                 url: String?
                             ): Boolean {
-                                toDetail(controller = controller, url = url)
+//                                toDetail(controller = controller, url = url)
+                                Log.e("DetailScreen", "shouldOverrideUrlLoading: $url")
                                 return true
                             }
 
@@ -75,9 +78,15 @@ fun DetailScreen(controller: NavHostController, link: String) {
                                 view: WebView?,
                                 request: WebResourceRequest?
                             ): Boolean {
-                                toDetail(
-                                    controller = controller,
-                                    url = request?.url?.toString().orEmpty()
+//                                toDetail(
+//                                    controller = controller,
+//                                    url = request?.url?.toString().orEmpty()
+//                                )
+                                Log.e(
+                                    "DetailScreen",
+                                    "shouldOverrideUrlLoading: ${
+                                        request?.url?.toString().orEmpty()
+                                    }"
                                 )
                                 return true
                             }

@@ -10,6 +10,7 @@ import com.github.crayonxiaoxin.wanandroid.data.Result
 import com.github.crayonxiaoxin.wanandroid.data.succeeded
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
+import com.github.crayonxiaoxin.wanandroid.model.BannerModel
 import kotlinx.coroutines.launch
 
 class HomeScreenVM : ViewModel() {
@@ -20,43 +21,53 @@ class HomeScreenVM : ViewModel() {
         getArticles(refresh)
     }
 
-    private val _bannerList = MutableLiveData<List<BannerData>>()
-    val bannerList: LiveData<List<BannerData>> = _bannerList
-    var bannerNetState: NetState = NetState.None
+    var bannerNetState: NetState = NetState.None // 用于判断是否是初始化
+    private val _bannerState = MutableLiveData<Result<List<BannerData>>>()
+    val bannerState: LiveData<Result<List<BannerData>>> = _bannerState
 
-    fun getBanner() {
+    private fun getBanner() {
         viewModelScope.launch {
             bannerNetState = NetState.Loading
             val res = Repository.getHomeBanner()
             if (res.succeeded) {
                 bannerNetState = NetState.Success
-                _bannerList.value = (res as Result.Success).data.data
+                (res as Result.Success).let {
+                    _bannerState.value = Result.Success(it.data.data)
+                }
             } else {
-                bannerNetState = NetState.Error((res as Result.Error).exception.message)
+                (res as Result.Error).let {
+                    _bannerState.value = Result.Error(it.exception)
+                    bannerNetState = NetState.Error(it.exception.message)
+                }
             }
         }
     }
 
-    private val _topArticleList = MutableLiveData<List<ArticleData>>()
-    var topArticleList = _topArticleList
-    var topArticleNetState: NetState = NetState.None
+    var topArticleNetState: NetState = NetState.None // 暂时用不到
+    private val _topArticleState = MutableLiveData<Result<List<ArticleData>>>()
+    var topArticleState: LiveData<Result<List<ArticleData>>> = _topArticleState
 
-    fun getTopArticles() {
+    private fun getTopArticles() {
         viewModelScope.launch {
             topArticleNetState = NetState.Loading
             val res = Repository.getTopArticles()
             if (res.succeeded) {
                 topArticleNetState = NetState.Success
-                _topArticleList.value = (res as Result.Success).data.data
+                (res as Result.Success).let {
+                    _topArticleState.value = Result.Success(it.data.data)
+                }
             } else {
-                topArticleNetState = NetState.Error((res as Result.Error).exception.message)
+                (res as Result.Error).let {
+                    topArticleNetState = NetState.Error(it.exception.message)
+                    _topArticleState.value = Result.Error(it.exception)
+                }
             }
         }
     }
 
-    private val _articleList = MutableLiveData<List<ArticleData>>()
-    var articleList = _articleList
-    var articleNetState: NetState = NetState.None
+    private val _articleState = MutableLiveData<Result<List<ArticleData>>>()
+    var articleState: LiveData<Result<List<ArticleData>>> = _articleState
+    var articleNetState: NetState = NetState.None // 用于控制显示不同的 list footer
     var articleCurrentPage = 1
     var articleTotalPage = 1
     var isLoading = false // 防止加载过快
@@ -72,19 +83,22 @@ class HomeScreenVM : ViewModel() {
                         isLoading = false
                         articleNetState = NetState.Success
                         val data = (res as Result.Success).data.data
-                        if (_articleList.value != null && articleCurrentPage > 1) {
+                        if (_articleState.value != null && articleCurrentPage > 1) {
                             val newList: MutableList<ArticleData> = ArrayList()
-                            newList.addAll(_articleList.value!!)
+                            newList.addAll((_articleState.value!! as Result.Success).data)
                             newList.addAll(data.datas)
-                            _articleList.value = newList
+                            _articleState.value = Result.Success(newList)
                         } else {
-                            _articleList.value = data.datas
+                            _articleState.value = Result.Success(data.datas)
                         }
                         articleTotalPage = data.pageCount
                         articleCurrentPage += 1
                     } else {
                         isLoading = false
-                        articleNetState = NetState.Error((res as Result.Error).exception.message)
+                        (res as Result.Error).let {
+                            articleNetState = NetState.Error(it.exception.message)
+                            _articleState.value = Result.Error(it.exception)
+                        }
                     }
                 }
             }

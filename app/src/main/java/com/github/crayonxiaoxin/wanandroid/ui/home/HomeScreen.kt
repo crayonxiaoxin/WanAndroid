@@ -18,6 +18,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import com.github.crayonxiaoxin.wanandroid.*
 import com.github.crayonxiaoxin.wanandroid.data.NetState
+import com.github.crayonxiaoxin.wanandroid.data.Result
+import com.github.crayonxiaoxin.wanandroid.data.succeeded
 import com.github.crayonxiaoxin.wanandroid.ui.common.Banner
 import com.github.crayonxiaoxin.wanandroid.ui.common.LazyListFooter
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
@@ -35,16 +37,16 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
     var state by remember {
         mutableStateOf(LoadState.Content)
     }
-    // Note: banner加载完成就可以 show content
+    // Note: banner加载完成就可以 show content，每次重组都需要判断状态
     state = when (vm.bannerNetState) {
         NetState.Loading -> LoadState.Loading
         NetState.Success -> LoadState.Content
         is NetState.Error -> LoadState.Retry
         else -> LoadState.Loading
     }
-    val bannerState by vm.bannerList.observeAsState()
-    val topArticleState by vm.topArticleList.observeAsState()
-    val articleState by vm.articleList.observeAsState()
+    val bannerState by vm.bannerState.observeAsState()
+    val topArticleState by vm.topArticleState.observeAsState()
+    val articleState by vm.articleState.observeAsState()
     // Note: 状态改变是否会导致整个HomeScreen刷新？是的，那么需要确保不能重复获取数据
     if (bannerState == null) {
         vm.init()
@@ -53,50 +55,60 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
     LoadStateLayout(
         state = state,
         retryOnClick = {
+            state = LoadState.Loading
             vm.init(true)
         }
     ) {
         Scaffold {
             Column {
-                bannerState?.let { banners ->
-                    Banner(
-                        bannerSize = banners.size,
-                        bannerItem = { banners.get(it) },
-                        onItemClick = {}
-                    )
+                bannerState?.let { bs ->
+                    if (bs.succeeded) {
+                        val banners = (bs as Result.Success).data
+                        Banner(
+                            bannerSize = banners.size,
+                            bannerItem = { banners.get(it) },
+                            onItemClick = {}
+                        )
+                    }
                 }
                 val homeListState = rememberLazyListState()
                 LazyColumn(state = homeListState) {
                     // Note: 这里 ?. 的操作是必需的，因为 State<T> 初始值为 null
-                    topArticleState?.let { articles ->
-                        if (articles.isNotEmpty()) {
-                            stickyHeader(key = "h1") {
-                                HomeListHeader("置顶文章")
-                            }
-                            items(articles.size, key = { articles[it].id }) { item ->
-                                ArticleItem(
-                                    data = articles[item],
-                                    isTop = true,
-                                    onItemClick = {
-                                        toDetail(controller = controller, url = it.link)
-                                    }
-                                )
+                    topArticleState?.let { ats ->
+                        if (ats.succeeded) {
+                            val articles = (ats as Result.Success).data
+                            if (articles.isNotEmpty()) {
+                                stickyHeader(key = "h1") {
+                                    HomeListHeader("置顶文章")
+                                }
+                                items(articles.size, key = { articles[it].id }) { item ->
+                                    ArticleItem(
+                                        data = articles[item],
+                                        isTop = true,
+                                        onItemClick = {
+                                            toDetail(controller = controller, url = it.link)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
 
-                    articleState?.let { articles ->
-                        if (articles.isNotEmpty()) {
-                            stickyHeader(key = "h2") {
-                                HomeListHeader("最新文章")
-                            }
-                            items(count = articles.size, key = { articles[it].id }) { item ->
-                                ArticleItem(
-                                    data = articles[item],
-                                    onItemClick = {
-                                        toDetail(controller = controller, url = it.link)
-                                    }
-                                )
+                    articleState?.let { ats ->
+                        if (ats.succeeded) {
+                            val articles = (ats as Result.Success).data
+                            if (articles.isNotEmpty()) {
+                                stickyHeader(key = "h2") {
+                                    HomeListHeader("最新文章")
+                                }
+                                items(count = articles.size, key = { articles[it].id }) { item ->
+                                    ArticleItem(
+                                        data = articles[item],
+                                        onItemClick = {
+                                            toDetail(controller = controller, url = it.link)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -116,10 +128,12 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                     snapshotFlow {
                         homeListState.firstVisibleItemIndex
                     }.distinctUntilChanged().collect { firstVisibleItemIndex ->
-                        vm.articleList.value?.let {
+                        vm.articleState.value?.let {
                             // Note: 上拉加载，到达底部，获取下一页数据
-                            if (firstVisibleItemIndex == it.size) {
-                                vm.getArticles()
+                            if (it.succeeded) {
+                                if (firstVisibleItemIndex == (it as Result.Success).data.size) {
+                                    vm.getArticles()
+                                }
                             }
                         }
                     }

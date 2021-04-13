@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
@@ -56,16 +58,19 @@ fun MainScreen(controller: NavHostController) {
             ) { page ->
                 val tab = HomeTabs.values()[page]
                 Box(
-                    Modifier
-                        .fillMaxSize()
+                    Modifier.fillMaxSize()
                 ) {
                     when (tab) {
                         HomeTabs.HOME -> HomeScreen(controller, homeVm)
                         HomeTabs.DAOHANG -> {
-                            DetailScreen(controller = controller, link = "https://www.baidu.com")
+                            Text(tab.name, modifier = Modifier
+                                .padding(32.dp)
+                                .fillMaxWidth())
                         }
                         HomeTabs.MINE -> MineScreen(controller)
-                        else -> Text(tab.name)
+                        else -> Text(tab.name, modifier = Modifier
+                            .padding(32.dp)
+                            .fillMaxWidth())
                     }
                 }
             }
