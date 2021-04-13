@@ -6,6 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.login.LoginScreen
@@ -15,10 +16,6 @@ internal val LocalBackDispatcher = staticCompositionLocalOf<OnBackPressedDispatc
     error("No back dispatcher provided")
 }
 
-internal const val HomeBannerInterval: Long = 3000L
-internal const val HomeBannerMaxCount = 10000
-internal const val HomeBannerAspectRatio = 0.55f
-
 @Composable
 fun NavMain(controller: NavHostController = rememberNavController()) {
     NavHost(navController = controller, startDestination = "main") {
@@ -27,5 +24,11 @@ fun NavMain(controller: NavHostController = rememberNavController()) {
         composable("detail/{url}") {
             DetailScreen(controller = controller, link = it.arguments?.getString("url").orEmpty())
         }
+    }
+}
+
+fun toDetail(controller: NavHostController, url: String?) {
+    if (!url.isNullOrEmpty()) {
+        controller.navigate("detail/$url")
     }
 }

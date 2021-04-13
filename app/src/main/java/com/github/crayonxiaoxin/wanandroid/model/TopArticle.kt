@@ -20,7 +20,7 @@ data class ArticleData(
     val envelopePic: String?,
     val fresh: Boolean?,
     val host: String?,
-    val id: Int?,
+    val id: Int,
     val link: String?,
     val niceDate: String?,
     val niceShareDate: String?,

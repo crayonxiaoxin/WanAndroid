@@ -1,25 +1,38 @@
 package com.github.crayonxiaoxin.wanandroid.ui.detail
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
-import com.google.accompanist.insets.statusBarsPadding
+import com.github.crayonxiaoxin.wanandroid.data.NetState
+import com.github.crayonxiaoxin.wanandroid.toDetail
+import com.github.crayonxiaoxin.wanandroid.ui.common.DetailTopBar
+import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
+import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun DetailScreen(controller: NavHostController, link: String) {
+    val state = remember {
+        mutableStateOf(LoadState.Loading)
+    }
     Scaffold(
         topBar = {
             DetailTopBar(
@@ -40,69 +53,73 @@ fun DetailScreen(controller: NavHostController, link: String) {
             )
         }
     ) {
-        AndroidView(
-            factory = { context ->
-                WebView(context).apply {
-                    settings.run {
-                        javaScriptEnabled = true
-                        setSupportZoom(false)
-                        javaScriptCanOpenWindowsAutomatically = false
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        ) {
-            it.loadUrl(link)
-        }
-    }
-}
+        LoadStateLayout(state = state.value) {
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        settings.run {
+                            javaScriptEnabled = true
+                            setSupportZoom(false)
+                            javaScriptCanOpenWindowsAutomatically = false
+                        }
+                        webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                url: String?
+                            ): Boolean {
+                                toDetail(controller = controller, url = url)
+                                return true
+                            }
 
-@Composable
-private fun DetailTopBar(
-    modifier: Modifier = Modifier,
-    title: @Composable () -> Unit = {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "详情")
-        }
-    },
-    navigationIcon: @Composable () -> Unit = {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "",
-            modifier = Modifier.clickable { navigationIconClick() }
-        )
-    },
-    navigationIconClick: () -> Unit = {},
-    actions: @Composable () -> Unit = {}
-) {
-    Box(modifier = modifier) {
-        TopAppBar(
-            modifier = Modifier
-                .statusBarsPadding()
-                .background(color = Color.Transparent),
-        ) {
-            Box {
-                title()
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    navigationIcon()
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    actions()
-                }
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                request: WebResourceRequest?
+                            ): Boolean {
+                                toDetail(
+                                    controller = controller,
+                                    url = request?.url?.toString().orEmpty()
+                                )
+                                return true
+                            }
+
+                            override fun onPageStarted(
+                                view: WebView?,
+                                url: String?,
+                                favicon: Bitmap?
+                            ) {
+                                super.onPageStarted(view, url, favicon)
+                                state.value = LoadState.Loading
+                            }
+
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                state.value = LoadState.Content
+                            }
+
+                            override fun onReceivedError(
+                                view: WebView?,
+                                errorCode: Int,
+                                description: String?,
+                                failingUrl: String?
+                            ) {
+                                super.onReceivedError(view, errorCode, description, failingUrl)
+                                state.value = LoadState.Retry
+                            }
+
+                            override fun onReceivedError(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                                error: WebResourceError?
+                            ) {
+                                super.onReceivedError(view, request, error)
+                                state.value = LoadState.Retry
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                it.loadUrl(link)
             }
         }
     }

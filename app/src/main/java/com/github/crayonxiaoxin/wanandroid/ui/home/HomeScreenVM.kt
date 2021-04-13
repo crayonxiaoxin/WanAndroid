@@ -9,13 +9,19 @@ import com.github.crayonxiaoxin.wanandroid.data.Repository
 import com.github.crayonxiaoxin.wanandroid.data.Result
 import com.github.crayonxiaoxin.wanandroid.data.succeeded
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
-import com.github.crayonxiaoxin.wanandroid.model.HomeBannerData
+import com.github.crayonxiaoxin.wanandroid.model.BannerData
 import kotlinx.coroutines.launch
 
 class HomeScreenVM : ViewModel() {
 
-    private val _bannerList = MutableLiveData<List<HomeBannerData>>()
-    val bannerList: LiveData<List<HomeBannerData>> = _bannerList
+    fun init(refresh: Boolean = false) {
+        getBanner()
+        getTopArticles()
+        getArticles(refresh)
+    }
+
+    private val _bannerList = MutableLiveData<List<BannerData>>()
+    val bannerList: LiveData<List<BannerData>> = _bannerList
     var bannerNetState: NetState = NetState.None
 
     fun getBanner() {
@@ -53,28 +59,37 @@ class HomeScreenVM : ViewModel() {
     var articleNetState: NetState = NetState.None
     var articleCurrentPage = 1
     var articleTotalPage = 1
-    fun getArticles() {
+    var isLoading = false // 防止加载过快
+    fun getArticles(isRefresh: Boolean = false) {
+        if (isRefresh) articleCurrentPage = 1
         if (articleCurrentPage <= articleTotalPage) {
             viewModelScope.launch {
-                articleNetState = NetState.Loading
-                val res = Repository.getArticles(articleCurrentPage)
-                if (res.succeeded) {
-                    articleNetState = NetState.Success
-                    val data = (res as Result.Success).data.data
-                    if (_articleList.value != null) {
-                        val newList = _articleList.value!!.map { it.copy() }
-                            .apply { toMutableList().addAll(data.datas) }
-                        _articleList.value = newList
+                if (!isLoading) {
+                    isLoading = true
+                    articleNetState = NetState.Loading
+                    val res = Repository.getArticles(articleCurrentPage)
+                    if (res.succeeded) {
+                        isLoading = false
+                        articleNetState = NetState.Success
+                        val data = (res as Result.Success).data.data
+                        if (_articleList.value != null && articleCurrentPage > 1) {
+                            val newList: MutableList<ArticleData> = ArrayList()
+                            newList.addAll(_articleList.value!!)
+                            newList.addAll(data.datas)
+                            _articleList.value = newList
+                        } else {
+                            _articleList.value = data.datas
+                        }
+                        articleTotalPage = data.pageCount
+                        articleCurrentPage += 1
                     } else {
-                        _articleList.value = data.datas
+                        isLoading = false
+                        articleNetState = NetState.Error((res as Result.Error).exception.message)
                     }
-                    articleTotalPage = data.pageCount
-                    articleCurrentPage += 1
-                } else {
-                    articleNetState = NetState.Error((res as Result.Error).exception.message)
                 }
             }
+        } else {
+            isLoading = false
         }
-
     }
 }

@@ -25,8 +25,6 @@ import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreenVM
 import com.github.crayonxiaoxin.wanandroid.ui.mine.MineScreen
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -39,11 +37,11 @@ import kotlinx.coroutines.launch
 fun MainScreen(controller: NavHostController) {
     val pagerState = rememberPagerState(pageCount = HomeTabs.values().size)
     val scope = rememberCoroutineScope()
-    val homeVm:HomeScreenVM = viewModel()
+    val homeVm: HomeScreenVM = viewModel()
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colors.primarySurface)
+            .background(color = MaterialTheme.colors.background)
     ) {
         Scaffold(
             bottomBar = { BottomBar(pagerState, scope) },
@@ -60,16 +58,14 @@ fun MainScreen(controller: NavHostController) {
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .background(color = MaterialTheme.colors.secondary)
                 ) {
-                    if (tab == HomeTabs.HOME) {
-                        HomeScreen(controller,homeVm)
-                    } else if (tab == HomeTabs.DAOHANG) {
-                        DetailScreen(controller = controller, link = "https://www.baidu.com")
-                    } else if (tab == HomeTabs.MINE) {
-                        MineScreen(controller)
-                    } else {
-                        Text(tab.name)
+                    when (tab) {
+                        HomeTabs.HOME -> HomeScreen(controller, homeVm)
+                        HomeTabs.DAOHANG -> {
+                            DetailScreen(controller = controller, link = "https://www.baidu.com")
+                        }
+                        HomeTabs.MINE -> MineScreen(controller)
+                        else -> Text(tab.name)
                     }
                 }
             }

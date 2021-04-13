@@ -2,7 +2,7 @@ package com.github.crayonxiaoxin.wanandroid.data
 
 import com.github.crayonxiaoxin.wanandroid.BuildConfig
 import com.github.crayonxiaoxin.wanandroid.model.Articles
-import com.github.crayonxiaoxin.wanandroid.model.HomeBannerModel
+import com.github.crayonxiaoxin.wanandroid.model.BannerModel
 import com.github.crayonxiaoxin.wanandroid.model.TopArticle
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,7 +14,7 @@ import retrofit2.http.Path
 interface ApiService {
 
     @GET("banner/json")
-    suspend fun getHomeBanner(): HomeBannerModel
+    suspend fun getHomeBanner(): BannerModel
 
     @GET("article/top/json")
     suspend fun getTopArticles(): TopArticle

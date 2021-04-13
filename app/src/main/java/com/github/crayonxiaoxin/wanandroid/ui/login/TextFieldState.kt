@@ -1,8 +1,8 @@
 package com.github.crayonxiaoxin.wanandroid.ui.login
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 open class TextFieldState(
     private val validator: (String) -> Boolean = { true },
