@@ -32,6 +32,7 @@ import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun DetailScreen(controller: NavHostController, link: String) {
+    Log.e("DetailScreen", "DetailScreen: link = $link")
     val state = remember {
         mutableStateOf(LoadState.Loading)
     }
@@ -55,7 +56,7 @@ fun DetailScreen(controller: NavHostController, link: String) {
             )
         }
     ) {
-        LoadStateLayout(state = state.value, retryOnClick = {}) {
+        LoadStateLayout(state = state.value, alwaysShowContent = true, retryOnClick = {}) {
             AndroidView(
                 factory = { context ->
                     WebView(context).apply {

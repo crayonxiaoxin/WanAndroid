@@ -11,3 +11,11 @@ val Result<*>.succeeded
 fun <T> Result<*>.successOr(fallback: T): T {
     return (this as? Result.Success<T>)?.data ?: fallback
 }
+
+fun <T> Result<T>.successData(): T {
+    return (this as Result.Success).data
+}
+
+fun Result<*>.errorException(): Exception {
+    return (this as Result.Error).exception
+}

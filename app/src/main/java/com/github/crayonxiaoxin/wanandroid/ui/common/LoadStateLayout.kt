@@ -29,6 +29,7 @@ fun LoadStateLayout(
     retry: @Composable () -> Unit = { DefaultRetryView(onClick = retryOnClick) },
     retryOnClick: () -> Unit = {},
     empty: @Composable () -> Unit = { DefaultEmptyView() },
+    alwaysShowContent: Boolean = false, // 用在状态在content中更改的情况，例如 WebView
     content: @Composable () -> Unit = {}
 ) {
     Box(
@@ -36,11 +37,11 @@ fun LoadStateLayout(
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        LoadStateFadeInOut(
-            isShow = state == LoadState.Content,
-            content = content,
-            initiallyVisible = false // Note: 用于初始化（例如 webView loadUrl 需要在 content 中完成）
-        )
+        if (alwaysShowContent) {
+            content()
+        } else {
+            LoadStateFadeInOut(isShow = state == LoadState.Content, content = content)
+        }
         LoadStateFadeInOut(isShow = state == LoadState.Loading, content = loading)
         LoadStateFadeInOut(isShow = state == LoadState.Retry, content = retry)
         LoadStateFadeInOut(isShow = state == LoadState.Empty, content = empty)

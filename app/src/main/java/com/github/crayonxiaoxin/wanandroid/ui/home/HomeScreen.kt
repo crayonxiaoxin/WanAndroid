@@ -20,6 +20,7 @@ import com.github.crayonxiaoxin.wanandroid.*
 import com.github.crayonxiaoxin.wanandroid.data.NetState
 import com.github.crayonxiaoxin.wanandroid.data.Result
 import com.github.crayonxiaoxin.wanandroid.data.succeeded
+import com.github.crayonxiaoxin.wanandroid.data.successData
 import com.github.crayonxiaoxin.wanandroid.ui.common.Banner
 import com.github.crayonxiaoxin.wanandroid.ui.common.LazyListFooter
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
@@ -63,10 +64,10 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
             Column {
                 bannerState?.let { bs ->
                     if (bs.succeeded) {
-                        val banners = (bs as Result.Success).data
+                        val banners = bs.successData()
                         Banner(
                             bannerSize = banners.size,
-                            bannerItem = { banners.get(it) },
+                            bannerItem = { banners[it] },
                             onItemClick = {}
                         )
                     }
@@ -76,7 +77,7 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                     // Note: 这里 ?. 的操作是必需的，因为 State<T> 初始值为 null
                     topArticleState?.let { ats ->
                         if (ats.succeeded) {
-                            val articles = (ats as Result.Success).data
+                            val articles = ats.successData()
                             if (articles.isNotEmpty()) {
                                 stickyHeader(key = "h1") {
                                     HomeListHeader("置顶文章")
@@ -96,7 +97,7 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
 
                     articleState?.let { ats ->
                         if (ats.succeeded) {
-                            val articles = (ats as Result.Success).data
+                            val articles = ats.successData()
                             if (articles.isNotEmpty()) {
                                 stickyHeader(key = "h2") {
                                     HomeListHeader("最新文章")

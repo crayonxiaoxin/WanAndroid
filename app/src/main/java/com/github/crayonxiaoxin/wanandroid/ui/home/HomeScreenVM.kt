@@ -4,10 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.crayonxiaoxin.wanandroid.data.NetState
-import com.github.crayonxiaoxin.wanandroid.data.Repository
-import com.github.crayonxiaoxin.wanandroid.data.Result
-import com.github.crayonxiaoxin.wanandroid.data.succeeded
+import com.github.crayonxiaoxin.wanandroid.data.*
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
 import com.github.crayonxiaoxin.wanandroid.model.BannerModel
@@ -31,13 +28,11 @@ class HomeScreenVM : ViewModel() {
             val res = Repository.getHomeBanner()
             if (res.succeeded) {
                 bannerNetState = NetState.Success
-                (res as Result.Success).let {
-                    _bannerState.value = Result.Success(it.data.data)
-                }
+                _bannerState.value = Result.Success(res.successData().data)
             } else {
-                (res as Result.Error).let {
-                    _bannerState.value = Result.Error(it.exception)
-                    bannerNetState = NetState.Error(it.exception.message)
+                res.errorException().let {
+                    _bannerState.value = Result.Error(it)
+                    bannerNetState = NetState.Error(it.message)
                 }
             }
         }
@@ -53,13 +48,11 @@ class HomeScreenVM : ViewModel() {
             val res = Repository.getTopArticles()
             if (res.succeeded) {
                 topArticleNetState = NetState.Success
-                (res as Result.Success).let {
-                    _topArticleState.value = Result.Success(it.data.data)
-                }
+                _topArticleState.value = Result.Success(res.successData().data)
             } else {
-                (res as Result.Error).let {
-                    topArticleNetState = NetState.Error(it.exception.message)
-                    _topArticleState.value = Result.Error(it.exception)
+                res.errorException().let {
+                    topArticleNetState = NetState.Error(it.message)
+                    _topArticleState.value = Result.Error(it)
                 }
             }
         }
@@ -82,10 +75,10 @@ class HomeScreenVM : ViewModel() {
                     if (res.succeeded) {
                         isLoading = false
                         articleNetState = NetState.Success
-                        val data = (res as Result.Success).data.data
+                        val data = res.successData().data
                         if (_articleState.value != null && articleCurrentPage > 1) {
                             val newList: MutableList<ArticleData> = ArrayList()
-                            newList.addAll((_articleState.value!! as Result.Success).data)
+                            newList.addAll(_articleState.value!!.successData())
                             newList.addAll(data.datas)
                             _articleState.value = Result.Success(newList)
                         } else {
@@ -95,9 +88,9 @@ class HomeScreenVM : ViewModel() {
                         articleCurrentPage += 1
                     } else {
                         isLoading = false
-                        (res as Result.Error).let {
-                            articleNetState = NetState.Error(it.exception.message)
-                            _articleState.value = Result.Error(it.exception)
+                        res.errorException().let {
+                            articleNetState = NetState.Error(it.message)
+                            _articleState.value = Result.Error(it)
                         }
                     }
                 }
