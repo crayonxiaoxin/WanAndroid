@@ -48,19 +48,17 @@ fun Banner(
             }
         }
 
-        BoxWithConstraints {
-            HorizontalPager(
-                state = pagerState,
-                offscreenLimit = offscreenLimit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(this.maxWidth.times(aspectRatio))
-            ) { page ->
-                BannerItem(
-                    item = bannerItem(page % bannerSize),
-                    onItemClick = onItemClick
-                )
-            }
+        HorizontalPager(
+            state = pagerState,
+            offscreenLimit = offscreenLimit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(aspectRatio)
+        ) { page ->
+            BannerItem(
+                item = bannerItem(page % bannerSize),
+                onItemClick = onItemClick
+            )
         }
     }
 }
