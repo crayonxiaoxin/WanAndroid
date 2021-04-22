@@ -68,7 +68,7 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                         Banner(
                             bannerSize = banners.size,
                             bannerItem = { banners[it] },
-                            onItemClick = {}
+                            onItemClick = { toDetail(controller, it.url) }
                         )
                     }
                 }

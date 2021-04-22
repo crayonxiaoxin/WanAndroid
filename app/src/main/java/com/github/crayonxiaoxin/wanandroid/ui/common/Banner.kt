@@ -1,5 +1,6 @@
 package com.github.crayonxiaoxin.wanandroid.ui.common
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
 import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -53,7 +55,8 @@ fun Banner(
             offscreenLimit = offscreenLimit,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(aspectRatio)
+//                .aspectRatio(0.55f) // error: can not work, the red background fill max size
+                .height(220.dp)
         ) { page ->
             BannerItem(
                 item = bannerItem(page % bannerSize),
@@ -64,24 +67,40 @@ fun Banner(
 }
 
 @Composable
-fun BannerItem(item: BannerData, onItemClick: (BannerData) -> Unit = {}) {
+fun BannerItem(
+    item: BannerData,
+    onItemClick: (BannerData) -> Unit = {}
+) {
     val completed = remember { mutableStateOf(false) }
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .clickable { onItemClick(item) }) {
         val (image, title) = createRefs()
-        CoilImage(
-            data = item.imagePath,
+        Image(
+            painter = rememberCoilPainter(
+                request = item.imagePath,
+            ),
             contentDescription = item.title,
             modifier = Modifier
                 .constrainAs(image) {
                     top.linkTo(parent.top)
-                },
-            onRequestCompleted = {
-                completed.value = true
-            },
+                }
+                .fillMaxWidth(),
             contentScale = ContentScale.Crop
+
         )
+//        CoilImage(
+//            data = item.imagePath,
+//            contentDescription = item.title,
+//            modifier = Modifier
+//                .constrainAs(image) {
+//                    top.linkTo(parent.top)
+//                },
+//            onRequestCompleted = {
+//                completed.value = true
+//            },
+//            contentScale = ContentScale.Crop
+//        )
         if (completed.value) {
             Text(
                 text = item.title,
