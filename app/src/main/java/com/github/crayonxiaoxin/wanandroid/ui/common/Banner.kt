@@ -5,10 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -17,10 +14,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
 import com.google.accompanist.coil.CoilImage
 import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.imageloading.isFinalState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 
 @ExperimentalPagerApi
 @Composable
@@ -50,18 +50,19 @@ fun Banner(
             }
         }
 
-        HorizontalPager(
-            state = pagerState,
-            offscreenLimit = offscreenLimit,
-            modifier = Modifier
-                .fillMaxWidth()
-//                .aspectRatio(0.55f) // error: can not work, the red background fill max size
-                .height(220.dp)
-        ) { page ->
-            BannerItem(
-                item = bannerItem(page % bannerSize),
-                onItemClick = onItemClick
-            )
+        BoxWithConstraints {
+            HorizontalPager(
+                state = pagerState,
+                offscreenLimit = offscreenLimit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(this.maxWidth.times(aspectRatio))
+            ) { page ->
+                BannerItem(
+                    item = bannerItem(page % bannerSize),
+                    onItemClick = onItemClick
+                )
+            }
         }
     }
 }
@@ -76,6 +77,14 @@ fun BannerItem(
         .fillMaxSize()
         .clickable { onItemClick(item) }) {
         val (image, title) = createRefs()
+        val painter = rememberCoilPainter(
+            request = item.imagePath,
+        )
+        LaunchedEffect(painter) {
+            snapshotFlow { painter.loadState }
+                .filter { it.isFinalState() }
+                .collect { completed.value = true }
+        }
         Image(
             painter = rememberCoilPainter(
                 request = item.imagePath,
@@ -89,18 +98,6 @@ fun BannerItem(
             contentScale = ContentScale.Crop
 
         )
-//        CoilImage(
-//            data = item.imagePath,
-//            contentDescription = item.title,
-//            modifier = Modifier
-//                .constrainAs(image) {
-//                    top.linkTo(parent.top)
-//                },
-//            onRequestCompleted = {
-//                completed.value = true
-//            },
-//            contentScale = ContentScale.Crop
-//        )
         if (completed.value) {
             Text(
                 text = item.title,
