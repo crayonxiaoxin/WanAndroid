@@ -56,7 +56,8 @@ fun Banner(
                 offscreenLimit = offscreenLimit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(this.maxWidth.times(aspectRatio))
+                    .aspectRatio(1.8f) // w:h = 1.8f (h = w/1.8f)
+//                    .height(this.maxWidth.times(aspectRatio))
             ) { page ->
                 BannerItem(
                     item = bannerItem(page % bannerSize),
