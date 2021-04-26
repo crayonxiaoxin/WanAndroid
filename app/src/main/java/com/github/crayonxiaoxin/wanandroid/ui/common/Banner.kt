@@ -31,7 +31,7 @@ fun Banner(
     isAutoPlay: Boolean = true,
     offscreenLimit: Int = 2,
     maxCount: Int = 10000,
-    aspectRatio: Float = 0.55f,
+    aspectRatio: Float = 1.8f,
     autoInterval: Long = 3000L
 ) {
     if (bannerSize > 0) {
@@ -50,20 +50,17 @@ fun Banner(
             }
         }
 
-        BoxWithConstraints {
-            HorizontalPager(
-                state = pagerState,
-                offscreenLimit = offscreenLimit,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1.8f) // w:h = 1.8f (h = w/1.8f)
-//                    .height(this.maxWidth.times(aspectRatio))
-            ) { page ->
-                BannerItem(
-                    item = bannerItem(page % bannerSize),
-                    onItemClick = onItemClick
-                )
-            }
+        HorizontalPager(
+            state = pagerState,
+            offscreenLimit = offscreenLimit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(aspectRatio) // w:h = aspectRatio (h = w/aspectRatio)
+        ) { page ->
+            BannerItem(
+                item = bannerItem(page % bannerSize),
+                onItemClick = onItemClick
+            )
         }
     }
 }

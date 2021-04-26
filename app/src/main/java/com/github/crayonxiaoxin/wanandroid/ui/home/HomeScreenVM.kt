@@ -7,32 +7,32 @@ import androidx.lifecycle.viewModelScope
 import com.github.crayonxiaoxin.wanandroid.data.*
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
-import com.github.crayonxiaoxin.wanandroid.model.BannerModel
 import kotlinx.coroutines.launch
 
 class HomeScreenVM : ViewModel() {
 
     fun init(refresh: Boolean = false) {
-        getBanner()
+        getBanner(refresh)
         getTopArticles()
         getArticles(refresh)
     }
 
-    var bannerNetState: NetState = NetState.None // 用于判断是否是初始化
+    //    var bannerNetState: NetState = NetState.None // 用于判断是否是初始化
+    var bannerNetState = MutableLiveData<NetState>(NetState.None) // 用于判断是否是初始化
     private val _bannerState = MutableLiveData<Result<List<BannerData>>>()
     val bannerState: LiveData<Result<List<BannerData>>> = _bannerState
 
-    private fun getBanner() {
+    private fun getBanner(refresh: Boolean) {
         viewModelScope.launch {
-            bannerNetState = NetState.Loading
+            bannerNetState.value = if (refresh) NetState.Refresh else NetState.Loading
             val res = Repository.getHomeBanner()
             if (res.succeeded) {
-                bannerNetState = NetState.Success
+                bannerNetState.value = NetState.Success
                 _bannerState.value = Result.Success(res.successData().data)
             } else {
                 res.errorException().let {
                     _bannerState.value = Result.Error(it)
-                    bannerNetState = NetState.Error(it.message)
+                    bannerNetState.value = NetState.Error(it.message)
                 }
             }
         }

@@ -26,6 +26,7 @@ import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreenVM
 import com.github.crayonxiaoxin.wanandroid.ui.mine.MineScreen
+import com.github.crayonxiaoxin.wanandroid.ui.tixi.TixiScreen
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -63,14 +64,19 @@ fun MainScreen(controller: NavHostController) {
                     when (tab) {
                         HomeTabs.HOME -> HomeScreen(controller, homeVm)
                         HomeTabs.DAOHANG -> {
-                            Text(tab.name, modifier = Modifier
-                                .padding(32.dp)
-                                .fillMaxWidth())
+                            Text(
+                                tab.name, modifier = Modifier
+                                    .padding(32.dp)
+                                    .fillMaxWidth()
+                            )
                         }
                         HomeTabs.MINE -> MineScreen(controller)
-                        else -> Text(tab.name, modifier = Modifier
-                            .padding(32.dp)
-                            .fillMaxWidth())
+                        HomeTabs.TIXI -> TixiScreen(controller)
+                        else -> Text(
+                            tab.name, modifier = Modifier
+                                .padding(32.dp)
+                                .fillMaxWidth()
+                        )
                     }
                 }
             }
