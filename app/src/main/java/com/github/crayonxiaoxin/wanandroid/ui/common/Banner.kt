@@ -3,25 +3,29 @@ package com.github.crayonxiaoxin.wanandroid.ui.common
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.github.crayonxiaoxin.wanandroid.model.BannerData
-import com.google.accompanist.coil.CoilImage
-import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.imageloading.isFinalState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
 
+@ExperimentalCoilApi
 @ExperimentalPagerApi
 @Composable
 fun Banner(
@@ -38,7 +42,8 @@ fun Banner(
         // 使用 Int.MAX_VALUE 会出错
         val pagerState = rememberPagerState(
             pageCount = bannerSize * maxCount,
-            initialPage = bannerSize * maxCount / 2
+            initialPage = bannerSize * maxCount / 2,
+            initialOffscreenLimit = offscreenLimit
         )
 
         LaunchedEffect(key1 = "bannerAutoPlay") {
@@ -52,7 +57,6 @@ fun Banner(
 
         HorizontalPager(
             state = pagerState,
-            offscreenLimit = offscreenLimit,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(aspectRatio) // w:h = aspectRatio (h = w/aspectRatio)
@@ -65,6 +69,7 @@ fun Banner(
     }
 }
 
+@ExperimentalCoilApi
 @Composable
 fun BannerItem(
     item: BannerData,
@@ -75,18 +80,16 @@ fun BannerItem(
         .fillMaxSize()
         .clickable { onItemClick(item) }) {
         val (image, title) = createRefs()
-        val painter = rememberCoilPainter(
-            request = item.imagePath,
+        val painter = rememberImagePainter(
+            data = item.imagePath,
         )
-        LaunchedEffect(painter) {
-            snapshotFlow { painter.loadState }
-                .filter { it.isFinalState() }
-                .collect { completed.value = true }
-        }
+//        LaunchedEffect(painter) {
+//            snapshotFlow { painter.loadState }
+//                .filter { it.isFinalState() }
+//                .collect { completed.value = true }
+//        }
         Image(
-            painter = rememberCoilPainter(
-                request = item.imagePath,
-            ),
+            painter = painter,
             contentDescription = item.title,
             modifier = Modifier
                 .constrainAs(image) {

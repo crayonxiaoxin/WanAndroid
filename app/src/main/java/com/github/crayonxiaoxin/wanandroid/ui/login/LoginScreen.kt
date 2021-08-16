@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.navigate
 import com.github.crayonxiaoxin.wanandroid.R
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -182,7 +181,7 @@ private fun UserNameField(
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged {
-                    val focused = it == FocusState.Active
+                    val focused = it.isFocused
                     usernameState.onFocusChange(focused)
                     if (!focused) {
                         usernameState.enableShowErrors()
@@ -238,7 +237,7 @@ private fun PasswordField(
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged {
-                    val focused = it == FocusState.Active
+                    val focused = it.isFocused
                     passwordState.onFocusChange(focused)
                     if (!focused) {
                         passwordState.enableShowErrors()
