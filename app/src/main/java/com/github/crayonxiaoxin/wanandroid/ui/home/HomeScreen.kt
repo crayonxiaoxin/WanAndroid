@@ -1,5 +1,6 @@
 package com.github.crayonxiaoxin.wanandroid.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,7 +9,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +24,6 @@ import com.github.crayonxiaoxin.wanandroid.ui.common.Banner
 import com.github.crayonxiaoxin.wanandroid.ui.common.LazyListFooter
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -140,9 +139,14 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                             vm.articleState.value?.let {
                                 // Note: 上拉加载，到达底部，获取下一页数据
                                 if (it.succeeded) {
-                                    if (firstVisibleItemIndex == (it as Result.Success).data.size) {
+                                    if (firstVisibleItemIndex == vm.articleLastSize) {
                                         vm.getArticles()
+                                        Log.e("TAG", "HomeScreen: 1")
                                     }
+                                    Log.e(
+                                        "TAG",
+                                        "HomeScreen: 2  firstVisibleItemIndex = $firstVisibleItemIndex  , size = ${(it as Result.Success).data.size} , lastSize = ${vm.articleLastSize}"
+                                    )
                                 }
                             }
                         }
