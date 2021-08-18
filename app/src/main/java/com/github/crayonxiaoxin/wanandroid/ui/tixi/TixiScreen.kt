@@ -1,5 +1,6 @@
 package com.github.crayonxiaoxin.wanandroid.ui.tixi
 
+import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.toast
+import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermission
+import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermissions
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.permissions.*
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
@@ -56,6 +60,7 @@ fun TixiScreen(controller: NavHostController) {
                     .fillMaxWidth()
                     .padding(10.dp),
             )
+            RequestPermissionsDemo()
         }
     }
 }
@@ -108,4 +113,38 @@ private fun TixiTopBar(
             }
         }
     }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun RequestPermissionsDemo() {
+//    RequestPermission(
+//        permission = Manifest.permission.CAMERA,
+//        revoked = {
+//            toast("Camera Permission not Granted")
+//        },
+//        granted = {
+//            toast("Camera Permission Granted")
+//        }
+//    )
+
+    RequestPermissions(
+        permissions = arrayListOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ),
+        revoked = {
+            it.forEach {
+                if (it == Manifest.permission.CAMERA) {
+                    toast("Camera permission not Granted")
+                }
+                if (it == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                    toast("Write permission not Granted")
+                }
+            }
+        },
+        granted = {
+            toast("Camera and Write permission Granted")
+        }
+    )
 }
