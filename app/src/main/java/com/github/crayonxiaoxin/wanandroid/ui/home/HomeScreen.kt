@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
 import com.github.crayonxiaoxin.wanandroid.*
 import com.github.crayonxiaoxin.wanandroid.data.NetState
 import com.github.crayonxiaoxin.wanandroid.data.Result
@@ -31,6 +32,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+@ExperimentalCoilApi
 @OptIn(ExperimentalFoundationApi::class, InternalCoroutinesApi::class)
 @ExperimentalPagerApi
 @Composable

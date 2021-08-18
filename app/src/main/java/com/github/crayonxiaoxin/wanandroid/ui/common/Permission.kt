@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import com.google.accompanist.permissions.*
 
-
+/**
+ * 申请单个权限
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestPermission(
@@ -36,6 +38,9 @@ fun RequestPermission(
     }
 }
 
+/**
+ * 申请多个权限
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestPermissions(

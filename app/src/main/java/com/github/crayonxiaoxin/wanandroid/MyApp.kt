@@ -17,10 +17,16 @@ class MyApp : Application() {
     }
 }
 
+/**
+ * 全局 toast
+ */
 fun toast(string: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(MyApp.appContext, string, duration).show()
 }
 
+/**
+ * 设置 状态栏 icon 颜色
+ */
 fun Activity.setSystemBarsDarkIcons(darkIcons: Boolean = false) {
     ViewCompat.getWindowInsetsController(this.window.decorView)?.let {
         it.isAppearanceLightStatusBars = darkIcons

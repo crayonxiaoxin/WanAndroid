@@ -8,6 +8,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import com.google.accompanist.insets.ProvideWindowInsets
 
+/**
+ * 入口
+ */
 @Composable
 fun App(backDispatcher: OnBackPressedDispatcher) {
     CompositionLocalProvider(

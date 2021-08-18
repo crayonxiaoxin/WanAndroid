@@ -1,14 +1,10 @@
 package com.github.crayonxiaoxin.wanandroid
 
-import android.app.Activity
 import android.os.Bundle
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import com.github.crayonxiaoxin.wanandroid.ui.theme.WanAndroidTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController

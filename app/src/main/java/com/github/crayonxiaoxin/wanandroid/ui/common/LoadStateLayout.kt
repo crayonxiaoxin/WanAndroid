@@ -22,6 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * 页面状态切换
+ */
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun LoadStateLayout(
