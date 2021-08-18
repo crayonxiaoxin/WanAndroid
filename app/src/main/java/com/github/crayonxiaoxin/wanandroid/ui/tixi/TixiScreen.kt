@@ -3,6 +3,7 @@ package com.github.crayonxiaoxin.wanandroid.ui.tixi
 import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -10,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -17,7 +19,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermission
@@ -37,7 +41,7 @@ fun TixiScreen(controller: NavHostController) {
         var value by remember {
             mutableStateOf("1231")
         }
-        Column {
+        Column(modifier = Modifier.fillMaxSize()) {
             Text(text = value)
             BasicTextField(
                 value = value,
@@ -61,6 +65,100 @@ fun TixiScreen(controller: NavHostController) {
                     .padding(10.dp),
             )
             RequestPermissionsDemo()
+            val openDialog = remember {
+                mutableStateOf(false)
+            }
+            Button(onClick = {
+                openDialog.value = true
+            }
+            ) {
+                Text(text = "Show Dialog")
+            }
+            if (openDialog.value) {
+                AlertDialog(
+                    modifier = Modifier.width(300.dp),
+                    onDismissRequest = {
+                        // user click outside the dialog or backPress
+                        openDialog.value = false
+                    },
+                    title = {
+                        Text(
+                            text = "Prompt",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    buttons = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Text(
+                                "取消",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .clickable { openDialog.value = false }
+                                    .padding(10.dp)
+                                    .weight(1f)
+                            )
+                            Text(
+                                "确定",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .clickable { openDialog.value = false }
+                                    .padding(10.dp)
+                                    .weight(1f)
+                            )
+                        }
+                    },
+                    text = {
+                        Text(
+                            text = "Here is the message",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                )
+            }
+            val openPopup = remember {
+                mutableStateOf(false)
+            }
+            Button(onClick = {
+                openPopup.value = true
+            }
+            ) {
+                Text(text = "Show Popup")
+            }
+            if (openPopup.value) {
+                Popup(
+                    alignment = Alignment.BottomCenter,
+                    onDismissRequest = { openPopup.value = false }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .background(color = Color.Cyan)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Here is the message",
+                            modifier = Modifier
+                                .clickable { openPopup.value = false }
+                                .padding(10.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Here is the message",
+                            modifier = Modifier
+                                .clickable { openPopup.value = false }
+                                .padding(10.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
         }
     }
 }

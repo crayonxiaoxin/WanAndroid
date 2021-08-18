@@ -52,7 +52,7 @@ fun MainScreen(controller: NavHostController) {
         ) { innerPadding ->
             HorizontalPager(
                 state = pagerState,
-                dragEnabled = false,
+                dragEnabled = true,
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
