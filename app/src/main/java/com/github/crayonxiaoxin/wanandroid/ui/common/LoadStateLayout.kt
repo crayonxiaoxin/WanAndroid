@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -51,13 +52,15 @@ fun LoadStateLayout(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun LoadStateFadeInOut(
-    isShow: Boolean,
+    isShow: Boolean = true,
     initiallyVisible: Boolean = false,
-    content: @Composable() () -> Unit
+    state: MutableTransitionState<Boolean> = MutableTransitionState(initiallyVisible).apply {
+        targetState = isShow
+    },
+    content: @Composable () -> Unit
 ) {
     AnimatedVisibility(
-        visible = isShow,
-        initiallyVisible = initiallyVisible,
+        visibleState = state,
         enter = fadeIn(animationSpec = tween(easing = FastOutLinearInEasing)),
         exit = fadeOut(animationSpec = tween(easing = LinearOutSlowInEasing))
     ) {

@@ -101,7 +101,8 @@ private fun BottomBar(
                 selected = (HomeTabs.values().indexOf(tab) == pagerState.currentPage),
                 onClick = {
                     scope.launch {
-                        pagerState.animateScrollToPage(HomeTabs.values().indexOf(tab))
+//                        pagerState.animateScrollToPage(HomeTabs.values().indexOf(tab))
+                        pagerState.scrollToPage(HomeTabs.values().indexOf(tab))
                     }
                 },
                 icon = {

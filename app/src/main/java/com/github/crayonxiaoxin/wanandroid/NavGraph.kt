@@ -7,10 +7,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.navigation.*
-import androidx.navigation.compose.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.rememberNavController
 import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.login.LoginScreen
 import com.github.crayonxiaoxin.wanandroid.ui.main.MainScreen
@@ -31,28 +30,28 @@ fun NavMain(controller: NavHostController = rememberAnimatedNavController()) {
             enterTransition = { initial, _ ->
                 when (initial.destination.route) {
                     "login" ->
-                        slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(700))
+                        slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             exitTransition = { _, target ->
                 when (target.destination.route) {
                     "login" ->
-                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(700))
+                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             popEnterTransition = { initial, _ ->
                 when (initial.destination.route) {
                     "login" ->
-                        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(700))
+                        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             popExitTransition = { _, target ->
                 when (target.destination.route) {
                     "login" ->
-                        slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(700))
+                        slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
                     else -> null
                 }
             }
@@ -64,28 +63,28 @@ fun NavMain(controller: NavHostController = rememberAnimatedNavController()) {
             enterTransition = { initial, _ ->
                 when (initial.destination.route) {
                     "main" ->
-                        slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(700))
+                        slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             exitTransition = { _, target ->
                 when (target.destination.route) {
                     "main" ->
-                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(700))
+                        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             popEnterTransition = { initial, _ ->
                 when (initial.destination.route) {
                     "main" ->
-                        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(700))
+                        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
                     else -> null
                 }
             },
             popExitTransition = { _, target ->
                 when (target.destination.route) {
                     "main" ->
-                        slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(700))
+                        slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
                     else -> null
                 }
             }

@@ -7,27 +7,34 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
-import com.github.crayonxiaoxin.wanandroid.data.NetState
-import com.github.crayonxiaoxin.wanandroid.toDetail
+import com.github.crayonxiaoxin.wanandroid.LocalBackDispatcher
 import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.DetailTopBar
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -36,23 +43,34 @@ fun DetailScreen(controller: NavHostController, link: String) {
     val state = remember {
         mutableStateOf(LoadState.Loading)
     }
+    val onBack: () -> Unit = {
+        CoroutineScope(Dispatchers.Main).launch {
+            // 假裝耗時操作
+            toast("back after 1s")
+            delay(1000)
+            // 根據情況，是否返回
+            controller.popBackStack()
+        }
+    }
+    // 攔截返回事件
+    BackHandler(enabled = true, onBack = onBack)
     Scaffold(
         topBar = {
             DetailTopBar(
-                modifier = Modifier.background(color = MaterialTheme.colors.primary),
+                modifier = Modifier
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(bottomEnd = 30.dp))
+                    .background(color = Color(255, 255, 255)),
                 title = {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 50.dp),
+                            .padding(start = 70.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(text = "详情")
                     }
                 },
-                navigationIconClick = {
-                    controller.popBackStack()
-                }
+                navigationIconClick = onBack
             )
         }
     ) {
