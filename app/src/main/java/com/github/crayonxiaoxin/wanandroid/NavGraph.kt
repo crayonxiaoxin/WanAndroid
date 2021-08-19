@@ -43,10 +43,37 @@ fun NavMain(controller: NavHostController = rememberAnimatedNavController()) {
             startDestination.value = if (User.isLogin()) "main" else "login"
         }
     }
-    AnimatedNavHost(navController = controller, startDestination = startDestination.value) {
-        animatedComposable("main") { MainScreen(controller = controller) }
-        animatedComposable("login") { LoginScreen(controller = controller) }
-        animatedComposable(
+    AnimatedNavHost(
+        navController = controller,
+        startDestination = startDestination.value,
+        enterTransition = { _, _ ->
+            slideInHorizontally(
+                initialOffsetX = { 1000 },
+                animationSpec = tween(300)
+            )
+        },
+        exitTransition = { _, _ ->
+            slideOutHorizontally(
+                targetOffsetX = { -1000 },
+                animationSpec = tween(300)
+            )
+        },
+        popEnterTransition = { _, _ ->
+            slideInHorizontally(
+                initialOffsetX = { -1000 },
+                animationSpec = tween(300)
+            )
+        },
+        popExitTransition = { _, _ ->
+            slideOutHorizontally(
+                targetOffsetX = { 1000 },
+                animationSpec = tween(300)
+            )
+        }
+    ) {
+        composable("main") { MainScreen(controller = controller) }
+        composable("login") { LoginScreen(controller = controller) }
+        composable(
             "detail/{url}",
             arguments = listOf(navArgument("url") { type = NavType.StringType })
         ) {
@@ -56,49 +83,6 @@ fun NavMain(controller: NavHostController = rememberAnimatedNavController()) {
             )
         }
     }
-}
-
-/**
- * 导航 - 默认动画
- */
-@ExperimentalAnimationApi
-fun NavGraphBuilder.animatedComposable(
-    route: String,
-    transitionDuration: Int = 300,
-    arguments: List<NamedNavArgument> = emptyList(),
-    deepLinks: List<NavDeepLink> = emptyList(),
-    enterTransition: (
-        (initial: NavBackStackEntry, target: NavBackStackEntry) -> EnterTransition?
-    )? = { _, _ ->
-        slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(transitionDuration))
-    },
-    exitTransition: (
-        (initial: NavBackStackEntry, target: NavBackStackEntry) -> ExitTransition?
-    )? = { _, _ ->
-        slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(transitionDuration))
-    },
-    popEnterTransition: (
-        (initial: NavBackStackEntry, target: NavBackStackEntry) -> EnterTransition?
-    )? = { _, _ ->
-        slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(transitionDuration))
-    },
-    popExitTransition: (
-        (initial: NavBackStackEntry, target: NavBackStackEntry) -> ExitTransition?
-    )? = { _, _ ->
-        slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(transitionDuration))
-    },
-    content: @Composable (NavBackStackEntry) -> Unit
-) {
-    composable(
-        route,
-        arguments,
-        deepLinks,
-        enterTransition,
-        exitTransition,
-        popEnterTransition,
-        popExitTransition,
-        content
-    )
 }
 
 fun toDetail(controller: NavHostController, url: String?) {
