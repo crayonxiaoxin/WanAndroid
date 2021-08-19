@@ -1,26 +1,36 @@
 package com.github.crayonxiaoxin.wanandroid
 
-import androidx.activity.OnBackPressedDispatcher
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import com.google.accompanist.insets.ProvideWindowInsets
+import android.app.Activity
+import android.app.Application
+import android.content.Context
+import android.widget.Toast
+import androidx.core.view.ViewCompat
 
-/**
- * 入口
- */
-@Composable
-fun App(backDispatcher: OnBackPressedDispatcher) {
-    CompositionLocalProvider(
-        // 返回栈
-        LocalBackDispatcher provides backDispatcher,
-        // set fontScale = 1f, then 1.sp == 1.dp, 防止字体跟随系统变化
-        LocalDensity provides Density(LocalDensity.current.density, fontScale = 1f)
-    ) {
-        ProvideWindowInsets {
-            NavMain()
-        }
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        appContext = this.applicationContext
+        User.provide(appContext)
+    }
+
+    companion object {
+        lateinit var appContext: Context
     }
 }
+
+/**
+ * 全局 toast
+ */
+fun toast(string: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(App.appContext, string, duration).show()
+}
+
+/**
+ * 设置 状态栏 icon 颜色
+ */
+fun Activity.setSystemBarsDarkIcons(darkIcons: Boolean = false) {
+    ViewCompat.getWindowInsetsController(this.window.decorView)?.let {
+        it.isAppearanceLightStatusBars = darkIcons
+    }
+}
+

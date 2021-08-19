@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Subject
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
-import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
+import com.github.crayonxiaoxin.wanandroid.User
+import com.github.crayonxiaoxin.wanandroid.ui.daohang.DaoHangScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreenVM
 import com.github.crayonxiaoxin.wanandroid.ui.mine.MineScreen
@@ -33,12 +35,15 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(controller: NavHostController) {
-    val pagerState = rememberPagerState(pageCount = HomeTabs.values().size)
+    val pagerState =
+        rememberPagerState(pageCount = HomeTabs.values().size, initialOffscreenLimit = 2)
     val scope = rememberCoroutineScope()
     val homeVm: HomeScreenVM = viewModel()
     Box(
@@ -64,11 +69,12 @@ fun MainScreen(controller: NavHostController) {
                     when (tab) {
                         HomeTabs.HOME -> HomeScreen(controller, homeVm)
                         HomeTabs.DAOHANG -> {
-                            Text(
-                                tab.name, modifier = Modifier
-                                    .padding(32.dp)
-                                    .fillMaxWidth()
-                            )
+//                            Text(
+//                                tab.name, modifier = Modifier
+//                                    .padding(32.dp)
+//                                    .fillMaxWidth()
+//                            )
+                            DaoHangScreen(controller)
                         }
                         HomeTabs.MINE -> MineScreen(controller)
                         HomeTabs.TIXI -> TixiScreen(controller)

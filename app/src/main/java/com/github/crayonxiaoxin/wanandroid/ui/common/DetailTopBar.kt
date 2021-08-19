@@ -22,54 +22,54 @@ import com.google.accompanist.insets.statusBarsPadding
  */
 @Composable
 fun DetailTopBar(
-    modifier: Modifier = Modifier,
-    titleLabel: String = "",
-    title: @Composable () -> Unit = {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = titleLabel)
-        }
-    },
-    navigationIconVector: ImageVector = Icons.Default.ArrowBack,
-    navigationIcon: @Composable () -> Unit = {
-        Icon(
-            imageVector = navigationIconVector,
-            contentDescription = "",
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(30.dp)) // 5. 裁剪點擊效果
-                .clickable { navigationIconClick() } // 4. 添加點擊效果
-                .padding(10.dp) // 3. 在 寬30、高30 的基礎上增加 10 padding
-                .height(30.dp)
-                .width(30.dp)
-        )
-    },
-    navigationIconClick: () -> Unit = {},
-    actions: @Composable () -> Unit = {}
+        modifier: Modifier = Modifier,
+        titleLabel: String = "",
+        title: @Composable () -> Unit = {
+            Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = titleLabel)
+            }
+        },
+        navigationIconVector: ImageVector = Icons.Default.ArrowBack,
+        navigationIconClick: () -> Unit = {},
+        navigationIcon: @Composable () -> Unit = {
+            Icon(
+                    imageVector = navigationIconVector,
+                    contentDescription = "",
+                    modifier = Modifier
+                            .clip(shape = RoundedCornerShape(30.dp)) // 5. 裁剪點擊效果
+                            .clickable { navigationIconClick() } // 4. 添加點擊效果
+                            .padding(10.dp) // 3. 在 寬30、高30 的基礎上增加 10 padding
+                            .height(30.dp)
+                            .width(30.dp)
+            )
+        },
+        actions: @Composable () -> Unit = {}
 ) {
     Box(modifier = modifier) {
         Box(
-            modifier = Modifier
-                .statusBarsPadding()
-                .background(color = Color.Transparent)
-                .height(60.dp)
+                modifier = Modifier
+                        .statusBarsPadding()
+                        .background(color = Color.Transparent)
+                        .height(60.dp)
         ) {
             title()
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
             ) {
                 navigationIcon()
             }
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(end = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
             ) {
                 actions()
             }

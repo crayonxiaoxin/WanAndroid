@@ -21,10 +21,7 @@ import com.github.crayonxiaoxin.wanandroid.data.NetState
 import com.github.crayonxiaoxin.wanandroid.data.Result
 import com.github.crayonxiaoxin.wanandroid.data.succeeded
 import com.github.crayonxiaoxin.wanandroid.data.successData
-import com.github.crayonxiaoxin.wanandroid.ui.common.Banner
-import com.github.crayonxiaoxin.wanandroid.ui.common.LazyListFooter
-import com.github.crayonxiaoxin.wanandroid.ui.common.LoadState
-import com.github.crayonxiaoxin.wanandroid.ui.common.LoadStateLayout
+import com.github.crayonxiaoxin.wanandroid.ui.common.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -38,14 +35,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Composable
 fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
     var state by remember {
-        mutableStateOf(LoadState.Content)
+        mutableStateOf<PageState>(PageState.Content)
     }
     // Note: banner加载完成就可以 show content，每次重组都需要判断状态
     state = when (vm.bannerNetState.value) {
-        NetState.Loading -> LoadState.Loading
-        NetState.Success -> LoadState.Content
-        is NetState.Error -> LoadState.Retry
-        else -> LoadState.Loading
+        NetState.Loading -> PageState.Loading
+        NetState.Success -> PageState.Content
+        is NetState.Error -> PageState.Retry
+        else -> PageState.Loading
     }
     val bannerState by vm.bannerState.observeAsState()
     val topArticleState by vm.topArticleState.observeAsState()
@@ -56,26 +53,26 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
         vm.init()
     }
 
-    LoadStateLayout(
-        state = state,
-        retryOnClick = {
-            state = LoadState.Loading
-            vm.init(true)
-        }
+    PageStateLayout(
+            state = state,
+            retryOnClick = {
+                state = PageState.Loading
+                vm.init(true)
+            }
     ) {
         Scaffold {
             val isRefresh = netState == NetState.Refresh
             SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing = isRefresh),
-                onRefresh = { vm.init(true) }) {
+                    state = rememberSwipeRefreshState(isRefreshing = isRefresh),
+                    onRefresh = { vm.init(true) }) {
                 Column {
                     bannerState?.let { bs ->
                         if (bs.succeeded) {
                             val banners = bs.successData()
                             Banner(
-                                bannerSize = banners.size,
-                                bannerItem = { banners[it] },
-                                onItemClick = { toDetail(controller, it.url) }
+                                    bannerSize = banners.size,
+                                    bannerItem = { banners[it] },
+                                    onItemClick = { toDetail(controller, it.url) }
                             )
                         }
                     }
@@ -91,11 +88,11 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                                     }
                                     items(articles.size, key = { articles[it].id }) { item ->
                                         ArticleItem(
-                                            data = articles[item],
-                                            isTop = true,
-                                            onItemClick = {
-                                                toDetail(controller = controller, url = it.link)
-                                            }
+                                                data = articles[item],
+                                                isTop = true,
+                                                onItemClick = {
+                                                    toDetail(controller = controller, url = it.link)
+                                                }
                                         )
                                     }
                                 }
@@ -110,13 +107,13 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                                         HomeListHeader("最新文章")
                                     }
                                     items(
-                                        count = articles.size,
-                                        key = { articles[it].id }) { item ->
+                                            count = articles.size,
+                                            key = { articles[it].id }) { item ->
                                         ArticleItem(
-                                            data = articles[item],
-                                            onItemClick = {
-                                                toDetail(controller = controller, url = it.link)
-                                            }
+                                                data = articles[item],
+                                                onItemClick = {
+                                                    toDetail(controller = controller, url = it.link)
+                                                }
                                         )
                                     }
                                 }
@@ -126,9 +123,9 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                         item(key = "footer") {
                             // Note: 根据 articleNetState 展示不同的 footer
                             LazyListFooter(
-                                netState = vm.articleNetState,
-                                isTheEnd = vm.articleCurrentPage == vm.articleTotalPage,
-                                retry = { vm.getArticles() }
+                                    netState = vm.articleNetState,
+                                    isTheEnd = vm.articleCurrentPage == vm.articleTotalPage,
+                                    retry = { vm.getArticles() }
                             )
                         }
                     }
@@ -146,8 +143,8 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
                                         Log.e("TAG", "HomeScreen: 1")
                                     }
                                     Log.e(
-                                        "TAG",
-                                        "HomeScreen: 2  firstVisibleItemIndex = $firstVisibleItemIndex  , size = ${(it as Result.Success).data.size} , lastSize = ${vm.articleLastSize}"
+                                            "TAG",
+                                            "HomeScreen: 2  firstVisibleItemIndex = $firstVisibleItemIndex  , size = ${(it as Result.Success).data.size} , lastSize = ${vm.articleLastSize}"
                                     )
                                 }
                             }
@@ -162,11 +159,11 @@ fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
 @Composable
 private fun HomeListHeader(title: String) {
     Text(
-        text = title,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color(0xFFF2F2F2))
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            text = title,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color(0xFFF2F2F2))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }

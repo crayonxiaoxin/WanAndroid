@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                 setSystemBarsDarkIcons(darkIcons)
             }
             WanAndroidTheme {
-                App(backDispatcher = onBackPressedDispatcher)
+                ComposeApp(backDispatcher = onBackPressedDispatcher)
             }
         }
     }

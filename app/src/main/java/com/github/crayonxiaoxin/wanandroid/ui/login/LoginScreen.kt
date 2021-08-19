@@ -13,10 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,6 +30,8 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
+import com.github.crayonxiaoxin.wanandroid.User
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -91,12 +90,14 @@ private fun LoginForm(controller: NavHostController) {
         val usernameState = remember { UsernameFieldState() }
         val passwordState = remember { PasswordFieldState() }
         val isLogin = remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+
         UserNameField(
             "用户名",
             usernameState,
             modifier = Modifier
                 .constrainAs(input1) {
-                    top.linkTo(parent.top, margin = 8.dp)
+                    top.linkTo(parent.top, margin = 16.dp)
                     centerHorizontallyTo(parent)
                 }
                 .fillMaxWidth(),
@@ -107,7 +108,7 @@ private fun LoginForm(controller: NavHostController) {
             passwordState,
             modifier = Modifier
                 .constrainAs(input2) {
-                    top.linkTo(input1.bottom, margin = 8.dp)
+                    top.linkTo(input1.bottom, margin = 16.dp)
                     centerHorizontallyTo(parent)
                 }
                 .fillMaxWidth(),
@@ -117,14 +118,21 @@ private fun LoginForm(controller: NavHostController) {
             onClick = {
                 isLogin.value = true
                 Log.e("LoginScreen", "LoginForm: " + passwordState.text)
-                controller.navigate("home")
+                scope.launch {
+                    User.isLogin(true)
+                }
+                controller.navigate("main") {
+                    // 跳转到 main 之前，先出栈到 login，包括 login
+                    popUpTo("login") { inclusive = true }
+                }
             },
             modifier = Modifier
                 .constrainAs(button) {
                     top.linkTo(input2.bottom, margin = 16.dp)
-                    bottom.linkTo(parent.bottom)
+                    bottom.linkTo(parent.bottom, margin = 16.dp)
                     centerHorizontallyTo(parent)
                 }
+                .padding(vertical = 16.dp)
                 .fillMaxWidth(),
             enabled = usernameState.isValid && passwordState.isValid && !isLogin.value
         ) {

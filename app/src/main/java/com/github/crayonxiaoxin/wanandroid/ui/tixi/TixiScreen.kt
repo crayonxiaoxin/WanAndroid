@@ -23,11 +23,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
+import com.github.crayonxiaoxin.wanandroid.User
 import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermission
 import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermissions
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalUnitApi::class)
 @Composable
@@ -159,6 +161,23 @@ fun TixiScreen(controller: NavHostController) {
                 }
             }
 
+            val scope = rememberCoroutineScope()
+            Button(onClick = {
+                scope.launch {
+                    User.isLogin(false)
+                }
+                controller.navigate("login") {
+                    // 跳转到 login 之前，先出栈到 main，包括 main
+                    popUpTo("main") { inclusive = true }
+                }
+            }
+            ) {
+                Text(text = "Logout")
+            }
+
+            DropdownDemo()
+
+
         }
     }
 }
@@ -245,4 +264,46 @@ private fun RequestPermissionsDemo() {
             toast("Camera and Write permission Granted")
         }
     )
+}
+
+@Composable
+fun DropdownDemo() {
+    var expanded by remember { mutableStateOf(false) }
+    val items = listOf("A", "B", "C", "D", "E", "F")
+    val disabledValue = "B"
+    var selectedIndex by remember { mutableStateOf(0) }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        Text(
+            items[selectedIndex],
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = { expanded = true })
+                .background(Color.Gray)
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Red)
+        ) {
+            items.forEachIndexed { index, s ->
+                DropdownMenuItem(onClick = {
+                    selectedIndex = index
+                    expanded = false
+                }) {
+                    val disabledText = if (s == disabledValue) {
+                        " (Disabled)"
+                    } else {
+                        ""
+                    }
+                    Text(text = s + disabledText)
+                }
+            }
+        }
+    }
 }

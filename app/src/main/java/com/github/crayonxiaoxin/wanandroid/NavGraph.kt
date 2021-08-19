@@ -2,9 +2,10 @@ package com.github.crayonxiaoxin.wanandroid
 
 import androidx.activity.OnBackPressedDispatcher
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.runtime.*
 import androidx.navigation.*
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
@@ -14,6 +15,10 @@ import com.github.crayonxiaoxin.wanandroid.ui.main.MainScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
 /**
@@ -29,7 +34,16 @@ internal val LocalBackDispatcher = staticCompositionLocalOf<OnBackPressedDispatc
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavMain(controller: NavHostController = rememberAnimatedNavController()) {
-    AnimatedNavHost(navController = controller, startDestination = "main") {
+    val scope = rememberCoroutineScope()
+    val startDestination = remember {
+        mutableStateOf("main")
+    }
+    SideEffect {
+        scope.launch {
+            startDestination.value = if (User.isLogin()) "main" else "login"
+        }
+    }
+    AnimatedNavHost(navController = controller, startDestination = startDestination.value) {
         animatedComposable("main") { MainScreen(controller = controller) }
         animatedComposable("login") { LoginScreen(controller = controller) }
         animatedComposable(
