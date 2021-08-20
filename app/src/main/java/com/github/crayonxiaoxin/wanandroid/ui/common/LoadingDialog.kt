@@ -1,5 +1,6 @@
 package com.github.crayonxiaoxin.wanandroid.ui.common
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -29,8 +31,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoadingDialog(
     text: String? = "Loading",
+    fontSize: TextUnit = 12.sp,
     size: Dp = 32.dp,
     delay: Long = 30L,
+    @DrawableRes image: Int = R.drawable.dialog_loading_img,
     onDismissRequest: () -> Unit = {},
     properties: DialogProperties = DialogProperties()
 ) {
@@ -64,14 +68,14 @@ fun LoadingDialog(
                 modifier = Modifier
                     .size(size)
                     .rotate(state.value),
-                painter = painterResource(id = R.drawable.dialog_loading_img),
+                painter = painterResource(id = image),
                 contentDescription = ""
             )
             text?.let {
                 Text(
                     it,
                     color = Color.White,
-                    fontSize = 14.sp,
+                    fontSize = fontSize,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }

@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -32,8 +33,12 @@ interface ApiService {
                     })
                 }
             }.build()
-            val retrofit = Retrofit.Builder().baseUrl(BASE_URL).client(client)
-                .addConverterFactory(GsonConverterFactory.create()).build()
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(client)
+                .addConverterFactory(ScalarsConverterFactory.create()) // 防止提交数据时， string => "string"
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
             return retrofit.create(ApiService::class.java)
         }
     }

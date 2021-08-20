@@ -146,7 +146,7 @@ fun TixiScreen(controller: NavHostController) {
                 Text(text = "Show Loading Dialog")
             }
             if (openLoading.value) {
-                LoadingDialog(onDismissRequest = { openLoading.value = false })
+                LoadingDialog(text = "加載中", onDismissRequest = { openLoading.value = false })
             }
 
             val scope = rememberCoroutineScope()

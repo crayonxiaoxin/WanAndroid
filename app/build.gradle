@@ -85,6 +85,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
     // 必须与retrofit中的okhttp版本一致，否则crash
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_version"
     // ViewModel

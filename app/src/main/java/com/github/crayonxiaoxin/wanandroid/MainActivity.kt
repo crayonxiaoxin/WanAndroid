@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
-import com.github.crayonxiaoxin.wanandroid.ui.theme.WanAndroidTheme
+import com.github.crayonxiaoxin.wanandroid.ui.theme.JetpackComposeTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                 systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = darkIcons)
                 setSystemBarsDarkIcons(darkIcons)
             }
-            WanAndroidTheme {
+            JetpackComposeTheme {
                 ComposeApp(backDispatcher = onBackPressedDispatcher)
             }
         }
