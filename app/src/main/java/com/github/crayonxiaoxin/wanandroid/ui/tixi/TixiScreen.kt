@@ -15,20 +15,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
-import com.github.crayonxiaoxin.wanandroid.User
 import com.github.crayonxiaoxin.wanandroid.toast
-import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermission
+import com.github.crayonxiaoxin.wanandroid.ui.common.Dialog
+import com.github.crayonxiaoxin.wanandroid.ui.common.LoadingDialog
 import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermissions
+import com.github.crayonxiaoxin.wanandroid.util.User
 import com.google.accompanist.insets.statusBarsPadding
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalUnitApi::class)
@@ -77,49 +82,19 @@ fun TixiScreen(controller: NavHostController) {
                 Text(text = "Show Dialog")
             }
             if (openDialog.value) {
-                AlertDialog(
+                Dialog(
                     modifier = Modifier.width(300.dp),
                     onDismissRequest = {
-                        // user click outside the dialog or backPress
                         openDialog.value = false
                     },
-                    title = {
-                        Text(
-                            text = "Prompt",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
+                    titleText = "title",
+                    messageText = "Here is the message",
+                    okClick = {
+                        openDialog.value = false
                     },
-                    buttons = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Text(
-                                "取消",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .clickable { openDialog.value = false }
-                                    .padding(10.dp)
-                                    .weight(1f)
-                            )
-                            Text(
-                                "确定",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .clickable { openDialog.value = false }
-                                    .padding(10.dp)
-                                    .weight(1f)
-                            )
-                        }
-                    },
-                    text = {
-                        Text(
-                            text = "Here is the message",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    },
+                    cancelClick = {
+                        openDialog.value = false
+                    }
                 )
             }
             val openPopup = remember {
@@ -159,6 +134,19 @@ fun TixiScreen(controller: NavHostController) {
                         )
                     }
                 }
+            }
+
+            val openLoading = remember {
+                mutableStateOf(false)
+            }
+            Button(onClick = {
+                openLoading.value = true
+            }
+            ) {
+                Text(text = "Show Loading Dialog")
+            }
+            if (openLoading.value) {
+                LoadingDialog(onDismissRequest = { openLoading.value = false })
             }
 
             val scope = rememberCoroutineScope()
@@ -307,3 +295,5 @@ fun DropdownDemo() {
         }
     }
 }
+
+

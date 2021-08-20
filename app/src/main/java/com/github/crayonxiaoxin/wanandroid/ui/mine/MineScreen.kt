@@ -1,12 +1,9 @@
 package com.github.crayonxiaoxin.wanandroid.ui.mine
 
-import android.content.ContentValues
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,9 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
-import java.io.File
+import com.github.crayonxiaoxin.wanandroid.util.saveMediaToStorageUri
 
 @Composable
 fun MineScreen(controller: NavHostController) {
@@ -116,45 +112,5 @@ fun PickPhotoDemo() {
     }
 }
 
-private fun Context.saveMediaToStorageUri(): Pair<String, Uri?> {
-    val currentFilePath: String
-    //Generating a file name
-    val filename = "IMG_${System.currentTimeMillis()}.jpeg"
-    //Output stream
-    var imageUri: Uri? = null
-    //For devices running android >= Q
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        //getting the contentResolver
-        contentResolver?.also { resolver ->
-            //Content resolver will process the contentvalues
-            val contentValues = ContentValues().apply {
-                //putting file information in content values
-                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-            }
-            //Inserting the contentValues to contentResolver and getting the Uri
-            imageUri =
-                resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        }
-        currentFilePath = ""
-    } else {
-        //These for devices running on android < Q
-        //So I don't think an explanation is needed here
-        val imagesDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val image = File(imagesDir, filename)
-        currentFilePath = image.absolutePath
-        imageUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            FileProvider.getUriForFile(
-                this,
-                "$packageName.provider",
-                image
-            )
-        } else {
-            Uri.fromFile(image)
-        }
-    }
-    return Pair(currentFilePath, imageUri)
-}
+
 

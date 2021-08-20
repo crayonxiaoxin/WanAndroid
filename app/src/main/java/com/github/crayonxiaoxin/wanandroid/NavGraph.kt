@@ -1,23 +1,21 @@
 package com.github.crayonxiaoxin.wanandroid
 
 import androidx.activity.OnBackPressedDispatcher
-import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.*
-import androidx.navigation.*
-import androidx.navigation.compose.NamedNavArgument
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.navArgument
 import com.github.crayonxiaoxin.wanandroid.ui.detail.DetailScreen
 import com.github.crayonxiaoxin.wanandroid.ui.login.LoginScreen
 import com.github.crayonxiaoxin.wanandroid.ui.main.MainScreen
+import com.github.crayonxiaoxin.wanandroid.util.User
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 

@@ -1,4 +1,4 @@
-package com.github.crayonxiaoxin.wanandroid
+package com.github.crayonxiaoxin.wanandroid.util
 
 import android.content.Context
 import androidx.datastore.core.DataStore

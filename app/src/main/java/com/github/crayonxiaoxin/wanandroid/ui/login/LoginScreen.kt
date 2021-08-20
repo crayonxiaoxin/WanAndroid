@@ -30,7 +30,7 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
-import com.github.crayonxiaoxin.wanandroid.User
+import com.github.crayonxiaoxin.wanandroid.util.User
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)

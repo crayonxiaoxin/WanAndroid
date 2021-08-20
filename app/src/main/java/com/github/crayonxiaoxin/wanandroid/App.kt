@@ -2,9 +2,17 @@ package com.github.crayonxiaoxin.wanandroid
 
 import android.app.Activity
 import android.app.Application
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
+import com.github.crayonxiaoxin.wanandroid.util.User
+import java.io.File
 
 class App : Application() {
     override fun onCreate() {
@@ -33,4 +41,3 @@ fun Activity.setSystemBarsDarkIcons(darkIcons: Boolean = false) {
         it.isAppearanceLightStatusBars = darkIcons
     }
 }
-

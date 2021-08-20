@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.github.crayonxiaoxin.wanandroid.model.BannerData
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -114,3 +113,14 @@ fun BannerItem(
         }
     }
 }
+
+data class BannerData(
+    val id: Int,
+    val title: String,
+    val imagePath: String,
+    val url: String,
+    val desc: String?,
+    val isVisible: Int?,
+    val order: Int?,
+    val type: Int?
+)

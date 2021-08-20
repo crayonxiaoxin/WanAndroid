@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.R
-import com.github.crayonxiaoxin.wanandroid.User
 import com.github.crayonxiaoxin.wanandroid.ui.daohang.DaoHangScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreen
 import com.github.crayonxiaoxin.wanandroid.ui.home.HomeScreenVM
