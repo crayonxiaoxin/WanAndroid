@@ -27,11 +27,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.DetailTopBar
-import com.github.crayonxiaoxin.wanandroid.ui.common.PageStateLayout
 import com.github.crayonxiaoxin.wanandroid.ui.common.PageState
+import com.github.crayonxiaoxin.wanandroid.ui.common.PageStateLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -53,97 +52,92 @@ fun DetailScreen(controller: NavHostController, link: String) {
     // 攔截返回事件
     BackHandler(enabled = true, onBack = onBack)
     Scaffold(
-            topBar = {
-                DetailTopBar(
+        topBar = {
+            DetailTopBar(
+                modifier = Modifier
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(bottomEnd = 30.dp))
+                    .background(color = Color(255, 255, 255)),
+                title = {
+                    Row(
                         modifier = Modifier
-                                .shadow(elevation = 2.dp, shape = RoundedCornerShape(bottomEnd = 30.dp))
-                                .background(color = Color(255, 255, 255)),
-                        title = {
-                            Row(
-                                    modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(start = 70.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "详情")
-                            }
-                        },
-                        navigationIconClick = onBack
-                )
-            }
+                            .fillMaxSize()
+                            .padding(start = 70.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "详情")
+                    }
+                },
+                navigationIconClick = onBack
+            )
+        }
     ) {
         PageStateLayout(state = state.value, alwaysShowContent = true, retryOnClick = {}) {
             AndroidView(
-                    factory = { context ->
-                        WebView(context).apply {
-                            settings.run {
-                                javaScriptEnabled = true
-                                setSupportZoom(false)
-                                javaScriptCanOpenWindowsAutomatically = false
+                factory = { context ->
+                    WebView(context).apply {
+                        settings.run {
+                            javaScriptEnabled = true
+                            setSupportZoom(false)
+                            javaScriptCanOpenWindowsAutomatically = false
+                        }
+                        webViewClient = object : WebViewClient() {
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                url: String?
+                            ): Boolean {
+                                Log.e("DetailScreen", "shouldOverrideUrlLoading: $url")
+                                return true
                             }
-                            webViewClient = object : WebViewClient() {
-                                override fun shouldOverrideUrlLoading(
-                                        view: WebView?,
-                                        url: String?
-                                ): Boolean {
-//                                toDetail(controller = controller, url = url)
-                                    Log.e("DetailScreen", "shouldOverrideUrlLoading: $url")
-                                    return true
-                                }
 
-                                override fun shouldOverrideUrlLoading(
-                                        view: WebView?,
-                                        request: WebResourceRequest?
-                                ): Boolean {
-//                                toDetail(
-//                                    controller = controller,
-//                                    url = request?.url?.toString().orEmpty()
-//                                )
-                                    Log.e(
-                                            "DetailScreen",
-                                            "shouldOverrideUrlLoading: ${
-                                                request?.url?.toString().orEmpty()
-                                            }"
-                                    )
-                                    return true
-                                }
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                request: WebResourceRequest?
+                            ): Boolean {
+                                Log.e(
+                                    "DetailScreen",
+                                    "shouldOverrideUrlLoading: ${
+                                        request?.url?.toString().orEmpty()
+                                    }"
+                                )
+                                return true
+                            }
 
-                                override fun onPageStarted(
-                                        view: WebView?,
-                                        url: String?,
-                                        favicon: Bitmap?
-                                ) {
-                                    super.onPageStarted(view, url, favicon)
-                                    state.value = PageState.Loading
-                                }
+                            override fun onPageStarted(
+                                view: WebView?,
+                                url: String?,
+                                favicon: Bitmap?
+                            ) {
+                                super.onPageStarted(view, url, favicon)
+                                state.value = PageState.Loading
+                            }
 
-                                override fun onPageFinished(view: WebView?, url: String?) {
-                                    super.onPageFinished(view, url)
-                                    state.value = PageState.Content
-                                }
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                state.value = PageState.Content
+                            }
 
-                                override fun onReceivedError(
-                                        view: WebView?,
-                                        errorCode: Int,
-                                        description: String?,
-                                        failingUrl: String?
-                                ) {
-                                    super.onReceivedError(view, errorCode, description, failingUrl)
-                                    state.value = PageState.Retry
-                                }
+                            override fun onReceivedError(
+                                view: WebView?,
+                                errorCode: Int,
+                                description: String?,
+                                failingUrl: String?
+                            ) {
+                                super.onReceivedError(view, errorCode, description, failingUrl)
+                                state.value = PageState.Retry
+                            }
 
-                                override fun onReceivedError(
-                                        view: WebView?,
-                                        request: WebResourceRequest?,
-                                        error: WebResourceError?
-                                ) {
-                                    super.onReceivedError(view, request, error)
-                                    state.value = PageState.Retry
-                                }
+                            override fun onReceivedError(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                                error: WebResourceError?
+                            ) {
+                                super.onReceivedError(view, request, error)
+                                state.value = PageState.Retry
                             }
                         }
-                    },
-                    modifier = Modifier.fillMaxSize()
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
             ) {
                 it.loadUrl(link)
             }
