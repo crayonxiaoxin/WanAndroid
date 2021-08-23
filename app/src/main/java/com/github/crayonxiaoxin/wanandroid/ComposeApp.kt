@@ -28,6 +28,10 @@ fun ComposeApp(backDispatcher: OnBackPressedDispatcher) {
 /**
  * Hex Color to Compose Color
  */
-fun Color.parse(colorString: String): Color {
+fun Color.Companion.parseColor(colorString: String): Color {
     return Color(android.graphics.Color.parseColor(colorString))
+}
+
+infix fun Color.Companion.useHex(colorString: String): Color {
+    return parseColor(colorString)
 }

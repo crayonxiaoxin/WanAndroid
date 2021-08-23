@@ -12,11 +12,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalFontLoader
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,6 +43,7 @@ import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
+@ExperimentalComposeUiApi
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 fun TixiScreen(controller: NavHostController) {
@@ -48,6 +56,11 @@ fun TixiScreen(controller: NavHostController) {
         var value by remember {
             mutableStateOf("1231")
         }
+        val focusManager = LocalFocusManager.current
+        val focusRequester = remember {
+            FocusRequester()
+        }
+        val softwareKeyboardController = LocalSoftwareKeyboardController.current
         Column(modifier = Modifier.fillMaxSize()) {
             Text(text = value)
             BasicTextField(
@@ -64,8 +77,16 @@ fun TixiScreen(controller: NavHostController) {
                 ),
                 keyboardActions = KeyboardActions(onDone = {
                     toast("enter: $value")
+                    focusManager.clearFocus()
+//                    softwareKeyboardController?.hide()
                 }),
                 modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (!it.isFocused) {
+                            softwareKeyboardController?.hide()
+                        }
+                    }
                     .padding(horizontal = 16.dp, vertical = 5.dp)
                     .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(5.dp))
                     .fillMaxWidth()
