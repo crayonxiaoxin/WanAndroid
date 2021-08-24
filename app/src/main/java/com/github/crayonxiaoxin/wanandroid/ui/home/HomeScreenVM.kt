@@ -2,14 +2,15 @@ package com.github.crayonxiaoxin.wanandroid.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.crayonxiaoxin.wanandroid.data.*
 import com.github.crayonxiaoxin.wanandroid.model.ArticleData
 import com.github.crayonxiaoxin.wanandroid.ui.common.BannerData
+import com.github.crayonxiaoxin.wanandroid.ui.common.BaseVM
+import com.github.crayonxiaoxin.wanandroid.ui.common.PageState
 import kotlinx.coroutines.launch
 
-class HomeScreenVM : ViewModel() {
+class HomeScreenVM : BaseVM() {
 
     fun init(refresh: Boolean = false) {
         getBanner(refresh)
@@ -17,41 +18,54 @@ class HomeScreenVM : ViewModel() {
         getArticles(refresh)
     }
 
-    //    var bannerNetState: NetState = NetState.None // 用于判断是否是初始化
-    var bannerNetState = MutableLiveData<NetState>(NetState.None) // 用于判断是否是初始化
     private val _bannerState = MutableLiveData<Result<List<BannerData>>>()
     val bannerState: LiveData<Result<List<BannerData>>> = _bannerState
 
     private fun getBanner(refresh: Boolean) {
         viewModelScope.launch {
-            bannerNetState.value = if (refresh) NetState.Refresh else NetState.Loading
-            val res = Repository.getHomeBanner()
-            if (res.succeeded) {
-                bannerNetState.value = NetState.Success
-                _bannerState.value = Result.Success(res.successData().data)
+            if (refresh) {
+                loadState.value = LoadState.Refresh
             } else {
-                res.errorException().let {
+                pageState.value = PageState.Loading
+                loadState.value = LoadState.Loading
+            }
+            val res = Repository.getHomeBanner()
+            if (res.isOK) {
+                if (refresh) {
+                    loadState.value = LoadState.Success
+                } else {
+                    pageState.value = PageState.Content
+                    loadState.value = LoadState.Success
+                }
+                _bannerState.value = Result.Success(res.data().data)
+            } else {
+                res.error().let {
                     _bannerState.value = Result.Error(it)
-                    bannerNetState.value = NetState.Error(it.message)
+                    if (refresh) {
+                        loadState.value = LoadState.Error(it.message)
+                    } else {
+                        pageState.value = PageState.Retry
+                        loadState.value = LoadState.Error(it.message)
+                    }
                 }
             }
         }
     }
 
-    var topArticleNetState: NetState = NetState.None // 暂时用不到
+    var topArticleLoadState: LoadState = LoadState.None // 暂时用不到
     private val _topArticleState = MutableLiveData<Result<List<ArticleData>>>()
     var topArticleState: LiveData<Result<List<ArticleData>>> = _topArticleState
 
     private fun getTopArticles() {
         viewModelScope.launch {
-            topArticleNetState = NetState.Loading
+            topArticleLoadState = LoadState.Loading
             val res = Repository.getTopArticles()
-            if (res.succeeded) {
-                topArticleNetState = NetState.Success
-                _topArticleState.value = Result.Success(res.successData().data)
+            if (res.isOK) {
+                topArticleLoadState = LoadState.Success
+                _topArticleState.value = Result.Success(res.data().data)
             } else {
-                res.errorException().let {
-                    topArticleNetState = NetState.Error(it.message)
+                res.error().let {
+                    topArticleLoadState = LoadState.Error(it.message)
                     _topArticleState.value = Result.Error(it)
                 }
             }
@@ -60,7 +74,7 @@ class HomeScreenVM : ViewModel() {
 
     private val _articleState = MutableLiveData<Result<List<ArticleData>>>()
     var articleState: LiveData<Result<List<ArticleData>>> = _articleState
-    var articleNetState: NetState = NetState.None // 用于控制显示不同的 list footer
+    var articleLoadState: LoadState = LoadState.None // 用于控制显示不同的 list footer
     var articleCurrentPage = 1
     var articleTotalPage = 1
     var articleLastSize = 0 // 當第一個可視item達到前一次的最後時，加載下一頁數據
@@ -71,16 +85,16 @@ class HomeScreenVM : ViewModel() {
             viewModelScope.launch {
                 if (!isLoading) {
                     isLoading = true
-                    articleNetState = NetState.Loading
+                    articleLoadState = LoadState.Loading
                     val res = Repository.getArticles(articleCurrentPage)
-                    if (res.succeeded) {
+                    if (res.isOK) {
                         isLoading = false
-                        articleNetState = NetState.Success
-                        val data = res.successData().data
+                        articleLoadState = LoadState.Success
+                        val data = res.data().data
                         if (_articleState.value != null && articleCurrentPage > 1) {
-                            articleLastSize = _articleState.value?.successData()?.size ?: 0
+                            articleLastSize = _articleState.value?.data()?.size ?: 0
                             val newList: MutableList<ArticleData> = ArrayList()
-                            newList.addAll(_articleState.value!!.successData())
+                            newList.addAll(_articleState.value!!.data())
                             newList.addAll(data.datas)
                             _articleState.value = Result.Success(newList)
                         } else {
@@ -91,8 +105,8 @@ class HomeScreenVM : ViewModel() {
                         articleCurrentPage += 1
                     } else {
                         isLoading = false
-                        res.errorException().let {
-                            articleNetState = NetState.Error(it.message)
+                        res.error().let {
+                            articleLoadState = LoadState.Error(it.message)
                             _articleState.value = Result.Error(it)
                         }
                     }

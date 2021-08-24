@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Subject
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,11 +39,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
+@ExperimentalComposeUiApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(controller: NavHostController) {
     val pagerState =
-        rememberPagerState(pageCount = HomeTabs.values().size, initialOffscreenLimit = 2)
+        rememberPagerState(pageCount = HomeTabs.values().size, initialOffscreenLimit = 1)
     val scope = rememberCoroutineScope()
     val homeVm: HomeScreenVM = viewModel()
     Box(

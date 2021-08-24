@@ -5,17 +5,26 @@ sealed class Result<out T> {
     data class Error(val exception: Exception) : Result<Nothing>()
 }
 
-val Result<*>.succeeded
+// Note: 第一步，判断请求是否成功
+val Result<*>.isOK
     get() = this is Result.Success && data != null
 
-fun <T> Result<*>.successOr(fallback: T): T {
-    return (this as? Result.Success<T>)?.data ?: fallback
-}
 
-fun <T> Result<T>.successData(): T {
+// Note: 第二步，获取真实的数据
+fun <T> Result<T>.data(): T {
     return (this as Result.Success).data
 }
 
-fun Result<*>.errorException(): Exception {
+fun <T> Result<*>.dataOr(fallback: T): T {
+    return (this as? Result.Success<T>)?.data ?: fallback
+}
+
+// Note: 获取异常信息
+fun Result<*>.error(): Exception {
     return (this as Result.Error).exception
+}
+
+// Note: 打印异常信息
+fun Result<*>.errorPrint() {
+    (this as Result.Error).exception.printStackTrace()
 }

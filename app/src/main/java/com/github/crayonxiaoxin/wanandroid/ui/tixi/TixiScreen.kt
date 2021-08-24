@@ -15,9 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -26,6 +24,7 @@ import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -73,26 +72,44 @@ fun TixiScreen(controller: NavHostController) {
                 ),
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
                 ),
-                keyboardActions = KeyboardActions(onDone = {
+                keyboardActions = KeyboardActions(onNext = {
                     toast("enter: $value")
-                    focusManager.clearFocus()
-//                    softwareKeyboardController?.hide()
+//                    focusManager.clearFocus()
+                    focusManager.moveFocus(FocusDirection.Down)
                 }),
+
+                decorationBox = {
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(5.dp)
+                            )
+                            .padding(10.dp)
+                    ) {
+                        it()
+                    }
+                },
                 modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
                     .focusRequester(focusRequester)
                     .onFocusChanged {
                         if (!it.isFocused) {
                             softwareKeyboardController?.hide()
                         }
                     }
-                    .padding(horizontal = 16.dp, vertical = 5.dp)
-                    .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(5.dp))
-                    .fillMaxWidth()
-                    .padding(10.dp),
             )
             RequestPermissionsDemo()
+            TextField(
+                value = value,
+                onValueChange = { value = it },
+                modifier = Modifier.focusRequester(focusRequester)
+            )
             val openDialog = remember {
                 mutableStateOf(false)
             }
