@@ -109,7 +109,7 @@ fun TixiScreen(controller: NavHostController) {
                     .focusRequester(focusRequester)
                     .onFocusChanged {
                         if (!it.isFocused) {
-                            softwareKeyboardController?.hide()
+//                            softwareKeyboardController?.hide()
                         }
                     }
             )
