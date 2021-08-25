@@ -2,17 +2,11 @@ package com.github.crayonxiaoxin.wanandroid
 
 import android.app.Activity
 import android.app.Application
-import android.content.ContentValues
 import android.content.Context
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
+import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import com.github.crayonxiaoxin.wanandroid.util.User
-import java.io.File
 
 class App : Application() {
     override fun onCreate() {
@@ -40,4 +34,19 @@ fun Activity.setSystemBarsDarkIcons(darkIcons: Boolean = false) {
     ViewCompat.getWindowInsetsController(this.window.decorView)?.let {
         it.isAppearanceLightStatusBars = darkIcons
     }
+}
+
+/**
+ * 设置窗体透明度
+ */
+fun Activity.setWindowAlpha(alpha: Float, darkIcons: Boolean = false) {
+    val layoutParams = window.attributes
+    layoutParams.alpha = alpha
+    window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+    window.attributes = layoutParams
+    setSystemBarsDarkIcons(darkIcons)
+}
+
+fun Context.setWindowAlpha(alpha: Float, darkIcons: Boolean = false) {
+    (this as Activity).setWindowAlpha(alpha, darkIcons)
 }

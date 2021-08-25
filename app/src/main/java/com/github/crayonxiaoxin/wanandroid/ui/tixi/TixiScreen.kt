@@ -1,6 +1,8 @@
 package com.github.crayonxiaoxin.wanandroid.ui.tixi
 
 import android.Manifest
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.*
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,21 +34,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
+import com.github.crayonxiaoxin.wanandroid.setWindowAlpha
 import com.github.crayonxiaoxin.wanandroid.toast
 import com.github.crayonxiaoxin.wanandroid.ui.common.Dialog
 import com.github.crayonxiaoxin.wanandroid.ui.common.LoadingDialog
+import com.github.crayonxiaoxin.wanandroid.ui.common.PopupBottomPositionProvider
 import com.github.crayonxiaoxin.wanandroid.ui.common.RequestPermissions
 import com.github.crayonxiaoxin.wanandroid.util.User
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
-@ExperimentalComposeUiApi
-@OptIn(ExperimentalUnitApi::class)
+@OptIn(ExperimentalUnitApi::class, ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun TixiScreen(controller: NavHostController) {
     val focusManager = LocalFocusManager.current
@@ -160,9 +166,13 @@ fun TixiScreen(controller: NavHostController) {
             ) {
                 Text(text = "Show Popup")
             }
+
             if (openPopup.value) {
+                LocalContext.current.setWindowAlpha(0.6f, true)
+                // BottomNavigation height
+                val offsetY = with(LocalDensity.current) { 56.dp.toPx().toInt() }
                 Popup(
-                    alignment = Alignment.BottomCenter,
+                    popupPositionProvider = PopupBottomPositionProvider(IntOffset(0, offsetY)),
                     onDismissRequest = { openPopup.value = false }
                 ) {
                     Column(
@@ -188,6 +198,9 @@ fun TixiScreen(controller: NavHostController) {
                         )
                     }
                 }
+
+            } else {
+                LocalContext.current.setWindowAlpha(1f, true)
             }
 
             val openLoading = remember {
@@ -223,6 +236,7 @@ fun TixiScreen(controller: NavHostController) {
         }
     }
 }
+
 
 @Composable
 private fun TixiTopBar(

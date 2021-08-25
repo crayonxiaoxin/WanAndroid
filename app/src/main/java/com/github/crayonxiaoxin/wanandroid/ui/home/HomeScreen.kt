@@ -29,9 +29,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-@ExperimentalCoilApi
 @OptIn(ExperimentalFoundationApi::class, InternalCoroutinesApi::class)
-@ExperimentalPagerApi
 @Composable
 fun HomeScreen(controller: NavHostController, vm: HomeScreenVM = viewModel()) {
     val pageState by vm.pageState.observeAsState(PageState.Loading)

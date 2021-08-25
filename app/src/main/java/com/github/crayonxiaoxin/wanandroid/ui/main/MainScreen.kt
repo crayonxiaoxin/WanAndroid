@@ -39,7 +39,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
-@ExperimentalComposeUiApi
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainScreen(controller: NavHostController) {

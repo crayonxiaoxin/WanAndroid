@@ -24,8 +24,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 
-@ExperimentalCoilApi
-@ExperimentalPagerApi
+@OptIn(ExperimentalCoilApi::class, ExperimentalPagerApi::class)
 @Composable
 fun Banner(
     bannerSize: Int = 0,

@@ -1,5 +1,6 @@
 package com.github.crayonxiaoxin.wanandroid.ui.daohang
 
+import android.util.Log
 import android.view.Gravity
 import android.widget.DatePicker
 import android.widget.PopupWindow
@@ -139,10 +140,11 @@ fun PopupWindowDemo() {
             }
         }
     }
+    Log.e("TAG", "PopupWindowDemo: LocalView.current.rootView = ${LocalView.current.rootView}")
 
 //    val popup =
 //        PopupWindow(cv, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT)
-//    popup.showAtLocation(LocalView.current, Gravity.BOTTOM, 0, 0)
+//    popup.showAtLocation(LocalView.current.rootView, Gravity.BOTTOM, 0, 0)
 }
 
 @Composable
