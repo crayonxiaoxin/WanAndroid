@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -46,23 +47,31 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalUnitApi::class)
 @Composable
 fun TixiScreen(controller: NavHostController) {
-    Scaffold(topBar = {
-        TixiTopBar(
-            background = Color.White,
-            selectedColor = Color.Black
-        )
-    }) {
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    Scaffold(
+        modifier = Modifier.clickable(
+            indication = null, // 取消点击时的涟漪效果
+            interactionSource = remember { MutableInteractionSource() }
+        ) { focusManager.clearFocus() },
+        topBar = {
+            TixiTopBar(
+                background = Color.White,
+                selectedColor = Color.Black
+            )
+        }
+    ) {
         var value by remember {
             mutableStateOf("1231")
         }
-        val focusManager = LocalFocusManager.current
-        val focusRequester = remember {
-            FocusRequester()
-        }
+
         val softwareKeyboardController = LocalSoftwareKeyboardController.current
         Column(modifier = Modifier.fillMaxSize()) {
             Text(text = value)
             BasicTextField(
+                enabled = true,
                 value = value,
                 onValueChange = { value = it },
                 maxLines = 2,
@@ -104,12 +113,19 @@ fun TixiScreen(controller: NavHostController) {
                         }
                     }
             )
-            RequestPermissionsDemo()
             TextField(
                 value = value,
+                singleLine = true,
                 onValueChange = { value = it },
-                modifier = Modifier.focusRequester(focusRequester)
+                modifier = Modifier.focusRequester(focusRequester),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
             )
+
+            RequestPermissionsDemo()
+
             val openDialog = remember {
                 mutableStateOf(false)
             }
